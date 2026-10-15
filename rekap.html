@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lembar Rekapitulasi Nilai Resmi - LKBB V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 15mm;
+            }
+            body { 
+                background: white !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            .no-print { display: none !important; }
+            .print-sheet {
+                page-break-inside: avoid;
+                break-inside: avoid;
+                box-shadow: none !important;
+                border: 2px solid #1e293b !important;
+                padding: 10px !important;
+                margin-bottom: 20px;
+                background: white !important;
+            }
+            .page-break { 
+                page-break-before: always; 
+                break-before: page;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50/70 via-slate-50 to-amber-50/50 text-slate-800 min-h-full pb-16 selection:bg-indigo-500 selection:text-white">
+
+    <!-- HEADER / KONTROL -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 shadow-sm no-print">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-black p-2.5 rounded-2xl shadow-md shadow-indigo-500/20 text-xs tracking-wider">LKBB</div>
+                <h1 class="font-extrabold text-sm sm:text-base text-slate-900">REKAPITULASI NILAI RESMI - LKBB V</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <span id="sync-status" class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Real-time Aktif
+                </span>
+                <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold px-4 py-2 rounded-xl text-xs transition shadow-md shadow-amber-500/20 active:scale-95 flex items-center gap-1.5">
+                    🖨️ Cetak Lembar & Hasil Juri
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        
+        <!-- PILIH PESERTA -->
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 space-y-4 no-print">
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-indigo-600 border-b border-slate-100 pb-2.5">Pilih Peserta untuk Ditampilkan Lembar Rekapnya</h2>
+            <select id="pilih-rekap-peserta" onchange="muatDataRekap()" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-extrabold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm">
+                <option value="">-- Pilih Sekolah / Peserta --</option>
+            </select>
+        </div>
+
+        <!-- LEMBAR REKAP FISIK UTAMA -->
+        <div id="lembar-rekap-fisik" class="print-sheet bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-200 p-6 sm:p-8 space-y-6">
+            
+            <!-- KOP LEMBAR REKAP & NOMOR URUT -->
+            <div class="grid grid-cols-3 items-center border-b-2 border-slate-800 pb-4">
+                <div class="space-y-1">
+                    <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">REKAP NILAI TOTAL PESERTA</div>
+                    <div id="kop-sekolah" class="text-base sm:text-lg font-extrabold uppercase text-slate-900">-</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-xs font-black uppercase text-slate-600 tracking-wider">LKBB MURNI ALFABET V</div>
+                </div>
+                <div class="flex justify-end">
+                    <div class="border-2 border-slate-800 px-5 py-2 text-center rounded-2xl bg-slate-50 shadow-sm">
+                        <span class="block text-[10px] font-black uppercase tracking-wider text-slate-500">NO URUT</span>
+                        <span id="kop-no-urut" class="text-2xl font-black text-slate-900">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTAINER TABEL DETAIL ITEM PENILAIAN PER KATEGORI -->
+            <div id="container-tabel-kategori" class="space-y-6">
+                <div class="text-center text-slate-400 py-8 font-medium">Silakan pilih peserta terlebih dahulu untuk memuat lembar rekap.</div>
+            </div>
+
+            <!-- BAGIAN BAWAH: PENGURANGAN & TOTAL AKHIR -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t-2 border-slate-800">
+                
+                <!-- TABEL KATEGORI PENGURANGAN -->
+                <div class="space-y-2">
+                    <div class="bg-slate-800 text-white font-extrabold text-xs p-2 text-center uppercase tracking-wider rounded-t-xl">KATEGORI PENGURANGAN POIN</div>
+                    <table class="w-full border-collapse border border-slate-800 text-xs">
+                        <thead>
+                            <tr class="bg-slate-100 font-bold text-center">
+                                <th class="border border-slate-800 p-1.5 w-8">NO</th>
+                                <th class="border border-slate-800 p-1.5 text-left px-2">PELANGGARAN</th>
+                                <th class="border border-slate-800 p-1.5 w-16">JML</th>
+                                <th class="border border-slate-800 p-1.5 w-16">POIN</th>
+                                <th class="border border-slate-800 p-1.5 w-20">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center font-medium">
+                            <tr>
+                                <td class="border border-slate-800 p-1.5 font-bold">1</td>
+                                <td class="border border-slate-800 p-1.5 text-left px-2">Menginjak Batas Garis</td>
+                                <td id="penyimpangan_1_jml" class="border border-slate-800 p-1.5">0</td>
+                                <td id="penyimpangan_1_poin" class="border border-slate-800 p-1.5 text-rose-600 font-bold">30</td>
+                                <td id="penyimpangan_1_tot" class="border border-slate-800 p-1.5 font-bold text-rose-600">0</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-800 p-1.5 font-bold">2</td>
+                                <td class="border border-slate-800 p-1.5 text-left px-2">Melebihi Batas Waktu</td>
+                                <td id="penyimpangan_2_jml" class="border border-slate-800 p-1.5">0</td>
+                                <td id="penyimpangan_2_poin" class="border border-slate-800 p-1.5 text-rose-600 font-bold">50</td>
+                                <td id="penyimpangan_2_tot" class="border border-slate-800 p-1.5 font-bold text-rose-600">0</td>
+                            </tr>
+                            <tr>
+                                <td class="border border-slate-800 p-1.5 font-bold">3</td>
+                                <td class="border border-slate-800 p-1.5 text-left px-2">Pasukan Pingsan Saat Tampil</td>
+                                <td id="penyimpangan_3_jml" class="border border-slate-800 p-1.5">0</td>
+                                <td id="penyimpangan_3_poin" class="border border-slate-800 p-1.5 text-rose-600 font-bold">20</td>
+                                <td id="penyimpangan_3_tot" class="border border-slate-800 p-1.5 font-bold text-rose-600">0</td>
+                            </tr>
+                            <tr class="bg-slate-100 font-bold">
+                                <td colspan="4" class="border border-slate-800 p-2 text-right px-2 font-black">TOTAL PENGURANGAN:</td>
+                                <td id="total-pengurangan-tabel" class="border border-slate-800 p-2 text-rose-600 font-black">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- KOTAK NILAI AKHIR & TANDA TANGAN -->
+                <div class="border-2 border-slate-800 p-5 bg-slate-50 rounded-2xl flex flex-col justify-between space-y-4 shadow-sm">
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="border-r border-slate-300 pr-2">
+                            <span class="block text-[11px] font-extrabold uppercase text-slate-500">TOTAL SKOR KOTOR</span>
+                            <span id="rekap-total-kotor" class="text-2xl font-black text-slate-800">0</span>
+                        </div>
+                        <div>
+                            <span class="block text-[11px] font-extrabold uppercase text-slate-500">NILAI AKHIR</span>
+                            <span id="box-nilai-akhir" class="text-3xl font-black text-indigo-700">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 pt-3 text-xs text-center border-t border-slate-300">
+                        <div>
+                            <span class="block font-bold mb-10 text-slate-700">TIM REKAPITULASI</span>
+                            <span class="border-t border-slate-800 pt-1 block font-medium">( ........................................ )</span>
+                        </div>
+                        <div>
+                            <span class="block font-bold mb-10 text-slate-700">PENANGGUNG JAWAB</span>
+                            <span class="border-t border-slate-800 pt-1 block font-medium">( ........................................ )</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= BAGIAN RINCIAN OPSI MASING-MASING JURI ================= -->
+        <div id="container-detail-juri" class="space-y-6 pt-6"></div>
+
+    </main>
+
+    <!-- SCRIPT RENDER LEMBAR REKAP & RINCIAN OPSI JURI DINAMIS -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, doc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAY-bJOK6QLFhpi5lQMLGNxsxIe8JNUvpg",
+            authDomain: "tryout-kebun-ilmu.firebaseapp.com",
+            projectId: "tryout-kebun-ilmu",
+            storageBucket: "tryout-kebun-ilmu.firebasestorage.app",
+            messagingSenderId: "497636674894",
+            appId: "1:497636674894:web:82fb38cb615d8bf7b1a21f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let unsubscribe = null;
+        let masterSoalCache = [];
+        let daftarJuriCache = [];
+        let infoPesertaSekolah = "";
+
+        async function muatMasterSoal() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "master_soal"));
+                masterSoalCache = [];
+                querySnapshot.forEach(docSnap => {
+                    masterSoalCache.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                masterSoalCache.sort((a, b) => (a.urutan || 99) - (b.urutan || 99));
+            } catch(e) { console.error(e); }
+        }
+
+        async function muatDaftarJuri() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "akun_juri"));
+                daftarJuriCache = [];
+                querySnapshot.forEach(docSnap => {
+                    daftarJuriCache.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                if(daftarJuriCache.length === 0) {
+                    daftarJuriCache = [
+                        { id: 'juri_1', namaJuri: 'Juri 1' },
+                        { id: 'juri_2', namaJuri: 'Juri 2' },
+                        { id: 'juri_3', namaJuri: 'Juri 3' }
+                    ];
+                }
+            } catch(e) {
+                daftarJuriCache = [
+                    { id: 'juri_1', namaJuri: 'Juri 1' },
+                    { id: 'juri_2', namaJuri: 'Juri 2' },
+                    { id: 'juri_3', namaJuri: 'Juri 3' }
+                ];
+            }
+        }
+
+        async function muatDropdownRekap() {
+            await muatMasterSoal();
+            await muatDaftarJuri();
+            const select = document.getElementById('pilih-rekap-peserta');
+            try {
+                const querySnapshot = await getDocs(collection(db, "daftar_peserta"));
+                let pesertaList = [];
+                querySnapshot.forEach((docSnap) => {
+                    pesertaList.push(docSnap.data());
+                });
+                pesertaList.sort((a, b) => Number(a.noUrut) - Number(b.noUrut));
+
+                pesertaList.forEach(d => {
+                    let opt = document.createElement('option');
+                    opt.value = d.noUrut;
+                    opt.setAttribute('data-sekolah', d.asalSekolah);
+                    opt.innerText = `No. Urut ${d.noUrut} - ${d.asalSekolah}`;
+                    select.appendChild(opt);
+                });
+            } catch(e) { console.error(e); }
+        }
+
+        window.muatDataRekap = function() {
+            const select = document.getElementById('pilih-rekap-peserta');
+            const noUrut = select.value;
+            const selectedOpt = select.options[select.selectedIndex];
+
+            if(!noUrut) return;
+
+            infoPesertaSekolah = selectedOpt.getAttribute('data-sekolah') || '-';
+            document.getElementById('kop-no-urut').innerText = noUrut;
+            document.getElementById('kop-sekolah').innerText = infoPesertaSekolah;
+
+            if(unsubscribe) unsubscribe();
+
+            unsubscribe = onSnapshot(doc(db, "lkbb_penilaian", `peserta_${noUrut}`), (docSnap) => {
+                if(docSnap.exists()) {
+                    let dataPesertaAktif = docSnap.data();
+                    renderSemuaTabelKategori(dataPesertaAktif);
+                    hitungRekapTotalSemua(dataPesertaAktif);
+                    renderDetailOpsiPerJuri(dataPesertaAktif, noUrut, infoPesertaSekolah);
+                } else {
+                    kosongkanTabel();
+                }
+            });
+        }
+
+        function renderSemuaTabelKategori(data) {
+            const container = document.getElementById('container-tabel-kategori');
+            container.innerHTML = '';
+
+            let grouped = {};
+            masterSoalCache.forEach(item => {
+                let kat = item.kategori || "Kategori Lain";
+                if(!grouped[kat]) grouped[kat] = [];
+                grouped[kat].push(item);
+            });
+
+            for(let kat in grouped) {
+                let items = grouped[kat];
+                let wrapper = document.createElement('div');
+                wrapper.className = "space-y-1";
+                
+                let headerKat = document.createElement('div');
+                headerKat.className = "bg-slate-800 text-white font-extrabold text-xs p-2 text-center uppercase tracking-wider rounded-t-xl";
+                headerKat.innerText = kat;
+                wrapper.appendChild(headerKat);
+
+                let table = document.createElement('table');
+                table.className = "w-full border-collapse border border-slate-800 text-xs text-center";
+                
+                let juriHeaderTh = '';
+                daftarJuriCache.forEach((juri, idx) => {
+                    juriHeaderTh += `<th class="border border-slate-800 p-1.5 w-12 font-bold">J${idx + 1}</th>`;
+                });
+
+                let thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr class="bg-slate-100 font-bold">
+                        <th class="border border-slate-800 p-1.5 w-8">NO</th>
+                        <th class="border border-slate-800 p-1.5 text-left px-2">ITEM PENILAIAN (${kat})</th>
+                        ${juriHeaderTh}
+                        <th class="border border-slate-800 p-1.5 w-14">TOT</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+
+                let tbody = document.createElement('tbody');
+                let subTotalJuriArr = new Array(daftarJuriCache.length).fill(0);
+                let subTotalSemua = 0;
+
+                items.forEach((item, index) => {
+                    let barisTotal = 0;
+                    let juriTdHtml = '';
+
+                    daftarJuriCache.forEach((juri, idx) => {
+                        let nilaiJuri = (data[juri.id] && data[juri.id][item.id] !== undefined) ? Number(data[juri.id][item.id]) : 0;
+                        subTotalJuriArr[idx] += nilaiJuri;
+                        barisTotal += nilaiJuri;
+                        juriTdHtml += `<td class="border border-slate-800 p-1.5 font-medium">${nilaiJuri || '-'}</td>`;
+                    });
+
+                    subTotalSemua += barisTotal;
+
+                    let tr = document.createElement('tr');
+                    tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+                    tr.innerHTML = `
+                        <td class="border border-slate-800 p-1.5 font-bold">${index + 1}</td>
+                        <td class="border border-slate-800 p-1.5 text-left px-2 font-semibold">${item.nama}</td>
+                        ${juriTdHtml}
+                        <td class="border border-slate-800 p-1.5 font-black bg-slate-100">${barisTotal || '-'}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                let juriSumTd = '';
+                subTotalJuriArr.forEach(subJ => {
+                    juriSumTd += `<td class="border border-slate-800 p-2 font-bold">${subJ}</td>`;
+                });
+
+                let trSum = document.createElement('tr');
+                trSum.className = "bg-slate-200 font-black";
+                trSum.innerHTML = `
+                    <td colspan="2" class="border border-slate-800 p-2 text-right px-2">JUMLAH ${kat}:</td>
+                    ${juriSumTd}
+                    <td class="border border-slate-800 p-2 text-indigo-950">${subTotalSemua}</td>
+                `;
+                tbody.appendChild(trSum);
+
+                table.appendChild(tbody);
+                wrapper.appendChild(table);
+                container.appendChild(wrapper);
+            }
+        }
+
+        function hitungRekapTotalSemua(data) {
+            let totalKotor = 0;
+            masterSoalCache.forEach(item => {
+                daftarJuriCache.forEach(juri => {
+                    let val = (data[juri.id] && data[juri.id][item.id]) ? Number(data[juri.id][item.id]) : 0;
+                    totalKotor += val;
+                });
+            });
+
+            document.getElementById('rekap-total-kotor').innerText = totalKotor;
+
+            let p1Jml = Number(data.pengurangan?.p1_jml) || 0;
+            let p1Poin = Number(data.pengurangan?.p1_poin ?? 30);
+            let p2Jml = Number(data.pengurangan?.p2_jml) || 0;
+            let p2Poin = Number(data.pengurangan?.p2_poin ?? 50);
+            let p3Jml = Number(data.pengurangan?.p3_jml) || 0;
+            let p3Poin = Number(data.pengurangan?.p3_poin ?? 20);
+
+            let t1 = p1Jml * p1Poin;
+            let t2 = p2Jml * p2Poin;
+            let t3 = p3Jml * p3Poin;
+            let totalPengurangan = t1 + t2 + t3;
+
+            document.getElementById('penyimpangan_1_jml').innerText = p1Jml;
+            document.getElementById('penyimpangan_1_poin').innerText = p1Poin;
+            document.getElementById('penyimpangan_1_tot').innerText = `-${t1}`;
+
+            document.getElementById('penyimpangan_2_jml').innerText = p2Jml;
+            document.getElementById('penyimpangan_2_poin').innerText = p2Poin;
+            document.getElementById('penyimpangan_2_tot').innerText = `-${t2}`;
+
+            document.getElementById('penyimpangan_3_jml').innerText = p3Jml;
+            document.getElementById('penyimpangan_3_poin').innerText = p3Poin;
+            document.getElementById('penyimpangan_3_tot').innerText = `-${t3}`;
+
+            document.getElementById('total-pengurangan-tabel').innerText = `-${totalPengurangan}`;
+
+            let nilaiAkhir = totalKotor - totalPengurangan;
+            document.getElementById('box-nilai-akhir').innerText = nilaiAkhir;
+        }
+
+        function renderDetailOpsiPerJuri(data, noUrut, sekolah) {
+            const containerDetail = document.getElementById('container-detail-juri');
+            containerDetail.innerHTML = '';
+
+            daftarJuriCache.forEach((juri, idx) => {
+                let jKey = juri.id;
+                let namaJuriTampil = juri.namaJuri || `Juri ${idx + 1}`;
+                let nilaiJuriObj = data[jKey] || {};
+
+                let wrapperJuri = document.createElement('div');
+                wrapperJuri.className = "print-sheet bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-200 p-6 sm:p-8 space-y-6 page-break mt-8";
+
+                let kopHtml = `
+                    <div class="grid grid-cols-3 items-center border-b-2 border-slate-800 pb-4">
+                        <div class="space-y-1">
+                            <div class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500">LEMBAR OPSI PENILAIAN - Juri ${idx + 1}: ${namaJuriTampil}</div>
+                            <div class="text-base sm:text-lg font-extrabold uppercase text-slate-900">${sekolah}</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-xs font-black uppercase text-slate-600 tracking-wider">LKBB MURNI ALFABET V</div>
+                        </div>
+                        <div class="flex justify-end">
+                            <div class="border-2 border-slate-800 px-5 py-2 text-center rounded-2xl bg-slate-50 shadow-sm">
+                                <span class="block text-[10px] font-black uppercase tracking-wider text-slate-500">NO URUT</span>
+                                <span class="text-2xl font-black text-slate-900">${noUrut}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                wrapperJuri.innerHTML += kopHtml;
+
+                let grouped = {};
+                masterSoalCache.forEach(item => {
+                    let kat = item.kategori || "Kategori Lain";
+                    if(!grouped[kat]) grouped[kat] = [];
+                    grouped[kat].push(item);
+                });
+
+                let subTotalJuri = 0;
+                let containerTabelJuri = document.createElement('div');
+                containerTabelJuri.className = "space-y-4";
+
+                for(let kat in grouped) {
+                    let items = grouped[kat];
+                    let divKat = document.createElement('div');
+                    let table = document.createElement('table');
+                    table.className = "w-full border-collapse border border-slate-800 text-xs text-center";
+                    
+                    let thSkorCols = '';
+                    for(let c=1; c<=6; c++) {
+                        thSkorCols += `<th class="border border-slate-800 p-1.5 w-10 font-bold">${c}</th>`;
+                    }
+
+                    let thead = document.createElement('thead');
+                    thead.innerHTML = `
+                        <tr class="bg-indigo-600 text-white font-extrabold text-center">
+                            <th class="border border-slate-800 p-2.5 w-10" rowspan="2">NO</th>
+                            <th class="border border-slate-800 p-2.5 text-left px-2" rowspan="2">ITEM PENILAIAN (${kat}) - Juri ${idx + 1} (${namaJuriTampil})</th>
+                            <th class="border border-slate-800 p-1.5" colspan="6">PILIHAN / OPSI NILAI</th>
+                        </tr>
+                        <tr class="bg-indigo-50 text-indigo-950 font-extrabold text-center text-xs">
+                            ${thSkorCols}
+                        </tr>
+                    `;
+                    table.appendChild(thead);
+
+                    let tbody = document.createElement('tbody');
+                    let itemNumber = 1;
+
+                    items.forEach((item, index) => {
+                        let currentVal = (nilaiJuriObj[item.id] !== undefined) ? Number(nilaiJuriObj[item.id]) : null;
+                        if(currentVal !== null && !isNaN(currentVal)) {
+                            subTotalJuri += currentVal;
+                        }
+
+                        let skorOptions = item.scores || [1, 2, 3, 4, 5, 6];
+                        let tds = '';
+
+                        skorOptions.forEach((score) => {
+                            let isChecked = (currentVal !== null && Number(currentVal) === Number(score));
+                            
+                            let stylePilih = isChecked ? 'bg-indigo-600 font-black text-white border-2 border-slate-800 shadow-sm' : 'text-slate-400 font-medium';
+                            
+                            // PERBAIKAN DI SINI: Menggunakan flex, items-center, justify-center, dan gap-1 agar centang & angka sejajar horizontal
+                            let textTampil = isChecked ? `<span class="font-bold">✓</span><span>${score}</span>` : score;
+
+                            tds += `<td class="border border-slate-800 p-1.5 text-center ${stylePilih}">
+                                <div class="flex items-center justify-center gap-1">${textTampil}</div>
+                            </td>`;
+                        });
+
+                        for (let c = skorOptions.length; c < 6; c++) {
+                            tds += `<td class="border border-slate-800 p-1.5 text-center text-slate-300">-</td>`;
+                        }
+
+                        let tr = document.createElement('tr');
+                        tr.className = index % 2 === 0 ? 'bg-white' : 'bg-slate-50/50';
+                        tr.innerHTML = `
+                            <td class="border border-slate-800 p-2 text-center font-bold">${itemNumber}</td>
+                            <td class="border border-slate-800 p-2 text-left px-2 font-semibold">${item.nama}</td>
+                            ${tds}
+                        `;
+                        tbody.appendChild(tr);
+                        itemNumber++;
+                    });
+
+                    table.appendChild(tbody);
+                    divKat.appendChild(table);
+                    containerTabelJuri.appendChild(divKat);
+                }
+
+                wrapperJuri.appendChild(containerTabelJuri);
+
+                let footerJuriHtml = `
+                    <div class="flex flex-col md:flex-row justify-between items-center border-t-2 border-slate-800 pt-4 gap-4">
+                        <div class="text-sm font-extrabold text-slate-800">
+                            Total Skor Juri ${idx + 1} (${namaJuriTampil}): <span class="text-indigo-700 text-lg font-black">${subTotalJuri}</span>
+                        </div>
+                        <div class="text-center text-xs">
+                            <div class="font-bold mb-10 text-slate-700">JURI ${idx + 1}: ${namaJuriTampil.toUpperCase()}</div>
+                            <div class="border-t border-slate-800 pt-1 font-medium">( ................................................... )</div>
+                        </div>
+                    </div>
+                `;
+                wrapperJuri.innerHTML += footerJuriHtml;
+
+                containerDetail.appendChild(wrapperJuri);
+            });
+        }
+
+        function kosongkanTabel() {
+            document.getElementById('kop-no-urut').innerText = '--';
+            document.getElementById('kop-sekolah').innerText = '-';
+            document.getElementById('box-nilai-akhir').innerText = '0';
+            document.getElementById('container-tabel-kategori').innerHTML = `<div class="text-center text-slate-400 py-8 font-medium">Data peserta belum tersedia.</div>`;
+            document.getElementById('container-detail-juri').innerHTML = '';
+        }
+
+        muatDropdownRekap();
+    </script>
+</body>
+</html>

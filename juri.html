@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Juri - LKBB Murni Alfabet V</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50/70 via-slate-50 to-amber-50/50 text-slate-800 min-h-full pb-16 selection:bg-indigo-500 selection:text-white">
+
+    <!-- ================= SECTION 1: HALAMAN LOGIN ================= -->
+    <div id="view-login" class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-md w-full bg-white/80 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl shadow-indigo-100/50 p-8 space-y-8 relative overflow-hidden">
+            <!-- Efek Dekoratiff Warna Cerah -->
+            <div class="absolute -top-20 -right-20 w-44 h-44 bg-amber-200/50 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-indigo-200/50 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="text-center space-y-3 relative z-10">
+                <div class="inline-flex items-center gap-2 bg-indigo-50 border border-indigo-200 text-indigo-700 font-extrabold px-4 py-1.5 rounded-full text-xs tracking-wider uppercase shadow-sm">
+                    <span>🏆 LKBB Murni Alfabet V</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Login Panel Juri</h1>
+                <p class="text-xs sm:text-sm text-slate-500">Masukkan ID Juri dan Password yang diberikan panitia.</p>
+            </div>
+
+            <div class="space-y-5 relative z-10">
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">ID Juri</label>
+                    <input type="text" id="login-id" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="Contoh: juri_1">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Password</label>
+                    <input type="password" id="login-pass" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="••••••••">
+                </div>
+                <button onclick="prosesLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold p-4 rounded-2xl transition shadow-lg shadow-indigo-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
+                    <span>Masuk ke Lembar Penilaian</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SECTION 2: FORM PENILAIAN ================= -->
+    <div id="view-penilaian" class="hidden min-h-screen">
+        <!-- HEADER CERAH -->
+        <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3.5">
+                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-black p-2.5 rounded-2xl shadow-md shadow-indigo-500/20 text-base tracking-wider">LKBB</div>
+                    <div>
+                        <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">FORM PENILAIAN JURI</h1>
+                        <p class="text-xs text-indigo-600 font-bold" id="info-juri-login">Memuat akun juri...</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 w-full md:w-auto justify-between md:justify-end">
+                    <span id="sync-status" class="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-full font-bold flex items-center gap-1.5 shadow-sm">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Siap
+                    </span>
+                    <button onclick="logoutJuri()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow-sm">
+                        🚪 Keluar
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+            <!-- KONTROL UTAMA -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-5 sm:p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <label for="pilih-peserta" class="font-extrabold text-xs uppercase tracking-wider text-slate-500 whitespace-nowrap">PILIH PESERTA TAMPIL:</label>
+                    <select id="pilih-peserta" onchange="pilihPesertaTampil()" class="w-full bg-slate-50 border border-slate-200 px-4 py-3 rounded-2xl font-extrabold text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition shadow-sm">
+                        <option value="">-- Pilih Peserta Tampil --</option>
+                    </select>
+                </div>
+
+                <!-- STATUS KUNCI (BANNER) -->
+                <div id="banner-status-kunci" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 font-bold text-xs sm:text-sm flex items-center gap-3 shadow-sm">
+                    <span class="text-xl">🔒</span>
+                    <span>Nilai untuk peserta ini telah <strong>DIKUNCI</strong>. Anda tidak dapat mengubah nilai lagi.</span>
+                </div>
+            </div>
+
+            <!-- TABEL FORM PENILAIAN -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white overflow-hidden p-5 sm:p-7 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-4">
+                    <div>
+                        <h2 class="text-lg font-extrabold text-slate-900 tracking-tight">Lembar Penilaian Gerakan PBB</h2>
+                        <p class="text-xs text-slate-500">Klik / tap pada tombol skor angka untuk memberikan penilaian.</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
+                    <table class="w-full border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-extrabold text-center">
+                                <th class="p-3.5 w-12 border-b border-slate-200" rowspan="2">NO</th>
+                                <th class="p-3.5 text-left border-b border-slate-200" rowspan="2">GERAKAN / ITEM PENILAIAN</th>
+                                <th class="p-2.5 border-b border-slate-200 text-indigo-700" colspan="6">PILIHAN SKOR</th>
+                            </tr>
+                            <tr class="bg-indigo-50/80 text-indigo-900 font-extrabold text-center text-xs" id="header-skor-kolom">
+                                <!-- Kolom skor dinamis -->
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-form-pbb" class="divide-y divide-slate-100">
+                            <tr><td colspan="8" class="p-8 text-center text-slate-400 font-medium">Silakan pilih peserta terlebih dahulu.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- PENGURANGAN POIN -->
+                <div class="pt-4 space-y-3">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 border-b border-slate-100 pb-2">Pengurangan Poin Pelanggaran</h3>
+                    <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm max-w-2xl">
+                        <table class="w-full border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700 font-bold text-center">
+                                    <th class="p-3 text-left border-r border-slate-200">JENIS PELANGGARAN</th>
+                                    <th class="p-3 w-28 border-r border-slate-200">JUMLAH</th>
+                                    <th class="p-3 w-28">POIN / KET</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 font-semibold text-slate-800 border-r border-slate-100">MENGINJAK BATAS GARIS</td>
+                                    <td class="p-2 text-center border-r border-slate-100"><input type="number" id="pengurangan_1_jml" value="0" min="0" oninput="autoSavePengurangan()" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 font-extrabold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition"></td>
+                                    <td class="p-2 text-center"><input type="number" id="pengurangan_1_poin" value="30" min="0" oninput="autoSavePengurangan()" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 font-extrabold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 font-semibold text-slate-800 border-r border-slate-100">MELEBIHI BATAS WAKTU</td>
+                                    <td class="p-2 text-center border-r border-slate-100"><input type="number" id="pengurangan_2_jml" value="0" min="0" oninput="autoSavePengurangan()" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 font-extrabold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition"></td>
+                                    <td class="p-2 text-center"><input type="number" id="pengurangan_2_poin" value="50" min="0" oninput="autoSavePengurangan()" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 font-extrabold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition"></td>
+                                </tr>
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-3 font-semibold text-slate-800 border-r border-slate-100">PASUKAN PINGSAN SAAT TAMPIL</td>
+                                    <td class="p-2 text-center border-r border-slate-100"><input type="number" id="pengurangan_3_jml" value="0" min="0" oninput="autoSavePengurangan()" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 font-extrabold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition"></td>
+                                    <td class="p-2 text-center"><input type="number" id="pengurangan_3_poin" value="20" min="0" oninput="autoSavePengurangan()" class="w-20 text-center bg-slate-50 border border-slate-200 rounded-xl p-1.5 font-extrabold text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white focus:outline-none transition"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TOTAL SKOR & TOMBOL KUNCI -->
+                <div class="mt-8 flex flex-col lg:flex-row justify-between items-center bg-gradient-to-r from-slate-900 to-indigo-950 text-white p-5 sm:p-6 rounded-3xl shadow-xl shadow-indigo-950/10 gap-4">
+                    <div class="text-base font-semibold">
+                        Total Skor Akhir (<span id="label-juri-aktif" class="text-amber-400 font-bold">Juri</span>): 
+                        <span id="total-skor-juri" class="text-amber-400 font-black text-3xl sm:text-4xl ml-2">0</span>
+                    </div>
+
+                    <div class="flex items-center gap-4 flex-wrap justify-end w-full lg:w-auto">
+                        <span id="save-indicator" class="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl">⚡ Auto-Save Aktif</span>
+                        
+                        <div id="wrapper-aksi-kunci" class="hidden">
+                            <button id="btn-kunci-peserta" onclick="kunciDanPindahPeserta()" class="bg-rose-600 hover:bg-rose-500 text-white font-extrabold px-5 py-3 rounded-2xl text-xs sm:text-sm shadow-lg shadow-rose-600/30 transition flex items-center gap-2 active:scale-95">
+                                🔒 Kunci Nilai & Pilih Peserta Lain
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAY-bJOK6QLFhpi5lQMLGNxsxIe8JNUvpg",
+            authDomain: "tryout-kebun-ilmu.firebaseapp.com",
+            projectId: "tryout-kebun-ilmu",
+            storageBucket: "tryout-kebun-ilmu.firebasestorage.app",
+            messagingSenderId: "497636674894",
+            appId: "1:497636674894:web:82fb38cb615d8bf7b1a21f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let activeJuriId = localStorage.getItem('active_juri_id');
+        let activeJuriNama = localStorage.getItem('active_juri_nama');
+
+        let masterSoal = [];
+        let databaseNilai = { isLocked: false };
+        let selectedPesertaKey = "";
+        let unsubRealtime = null;
+
+        function cekSesiLogin() {
+            if (activeJuriId && activeJuriNama) {
+                document.getElementById('view-login').classList.add('hidden');
+                document.getElementById('view-penilaian').classList.remove('hidden');
+                
+                document.getElementById('info-juri-login').innerText = `Login sebagai: ${activeJuriNama} (${activeJuriId})`;
+                document.getElementById('label-juri-aktif').innerText = activeJuriNama;
+
+                muatMasterSoal().then(() => muatDropdownPeserta());
+            } else {
+                document.getElementById('view-login').classList.remove('hidden');
+                document.getElementById('view-penilaian').classList.add('hidden');
+            }
+        }
+
+        window.prosesLogin = async function() {
+            const idJuri = document.getElementById('login-id').value.trim().toLowerCase();
+            const passJuri = document.getElementById('login-pass').value.trim();
+
+            if(!idJuri || !passJuri) {
+                alert("ID Juri dan Password harus diisi!");
+                return;
+            }
+
+            try {
+                const docRef = doc(db, "akun_juri", idJuri);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    if (data.password === passJuri) {
+                        localStorage.setItem('active_juri_id', data.idJuri || idJuri);
+                        localStorage.setItem('active_juri_nama', data.namaJuri);
+                        
+                        activeJuriId = data.idJuri || idJuri;
+                        activeJuriNama = data.namaJuri;
+
+                        alert(`Login Berhasil! Selamat bertugas, ${data.namaJuri}`);
+                        cekSesiLogin();
+                    } else {
+                        alert("Password salah! Silakan periksa kembali.");
+                    }
+                } else {
+                    alert("ID Juri tidak ditemukan dalam database panitia.");
+                }
+            } catch (e) {
+                console.error("Gagal login:", e);
+                alert("Terjadi kesalahan koneksi ke database.");
+            }
+        }
+
+        window.logoutJuri = function() {
+            localStorage.removeItem('active_juri_id');
+            localStorage.removeItem('active_juri_nama');
+            activeJuriId = null;
+            activeJuriNama = null;
+            if(unsubRealtime) unsubRealtime();
+            cekSesiLogin();
+        }
+
+        async function muatMasterSoal() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "master_soal"));
+                masterSoal = [];
+                querySnapshot.forEach((docSnap) => {
+                    masterSoal.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                masterSoal.sort((a, b) => (a.urutan || 99) - (b.urutan || 99));
+            } catch(e) { console.error(e); }
+        }
+
+        async function muatDropdownPeserta() {
+            const select = document.getElementById('pilih-peserta');
+            select.innerHTML = '<option value="">-- Pilih Peserta Tampil --</option>';
+            try {
+                const querySnapshot = await getDocs(collection(db, "daftar_peserta"));
+                let pesertaList = [];
+                querySnapshot.forEach((docSnap) => {
+                    pesertaList.push(docSnap.data());
+                });
+                pesertaList.sort((a, b) => Number(a.noUrut) - Number(b.noUrut));
+
+                pesertaList.forEach(d => {
+                    let opt = document.createElement('option');
+                    opt.value = d.noUrut;
+                    opt.setAttribute('data-sekolah', d.asalSekolah);
+                    opt.innerText = `No. Urut ${d.noUrut} - ${d.asalSekolah}`;
+                    select.appendChild(opt);
+                });
+
+                if (pesertaList.length > 0) {
+                    select.value = pesertaList[0].noUrut;
+                    pilihPesertaTampil();
+                }
+            } catch(e) { console.error(e); }
+        }
+
+        window.pilihPesertaTampil = async function() {
+            const select = document.getElementById('pilih-peserta');
+            const selectedOpt = select.options[select.selectedIndex];
+            const noUrut = select.value;
+            
+            if(!noUrut) {
+                selectedPesertaKey = "";
+                document.getElementById('wrapper-aksi-kunci').classList.add('hidden');
+                document.getElementById('banner-status-kunci').classList.add('hidden');
+                return;
+            }
+
+            selectedPesertaKey = `peserta_${noUrut}`;
+            const asalSekolah = selectedOpt.getAttribute('data-sekolah');
+
+            if(unsubRealtime) unsubRealtime();
+
+            unsubRealtime = onSnapshot(doc(db, "lkbb_penilaian", selectedPesertaKey), (docSnap) => {
+                if (docSnap.exists()) {
+                    databaseNilai = docSnap.data();
+                    if(!databaseNilai[activeJuriId]) databaseNilai[activeJuriId] = {};
+
+                    if(databaseNilai.pengurangan) {
+                        document.getElementById('pengurangan_1_jml').value = databaseNilai.pengurangan.p1_jml || 0;
+                        document.getElementById('pengurangan_1_poin').value = databaseNilai.pengurangan.p1_poin ?? 30;
+                        document.getElementById('pengurangan_2_jml').value = databaseNilai.pengurangan.p2_jml || 0;
+                        document.getElementById('pengurangan_2_poin').value = databaseNilai.pengurangan.p2_poin ?? 50;
+                        document.getElementById('pengurangan_3_jml').value = databaseNilai.pengurangan.p3_jml || 0;
+                        document.getElementById('pengurangan_3_poin').value = databaseNilai.pengurangan.p3_poin ?? 20;
+                    }
+                } else {
+                    databaseNilai = { [activeJuriId]: {}, noUrut: noUrut, asalSekolah: asalSekolah, isLocked: false };
+                }
+                
+                const banner = document.getElementById('banner-status-kunci');
+                const wrapperKunci = document.getElementById('wrapper-aksi-kunci');
+
+                if(databaseNilai.isLocked) {
+                    banner.classList.remove('hidden');
+                    wrapperKunci.classList.add('hidden');
+                } else {
+                    banner.classList.add('hidden');
+                    wrapperKunci.classList.remove('hidden');
+                }
+
+                renderForm();
+            });
+        }
+
+        window.kunciDanPindahPeserta = async function() {
+            if(!selectedPesertaKey) return;
+
+            if(confirm("Apakah Anda yakin ingin mengunci nilai peserta ini? Nilai tidak akan bisa diubah lagi setelah dikunci.")) {
+                databaseNilai.isLocked = true;
+                await autoSimpanKeFirebase();
+                
+                alert("Nilai berhasil dikunci!");
+                
+                document.getElementById('pilih-peserta').value = "";
+                selectedPesertaKey = "";
+                document.getElementById('wrapper-aksi-kunci').classList.add('hidden');
+                document.getElementById('banner-status-kunci').classList.add('hidden');
+                document.getElementById('tbody-form-pbb').innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400 font-medium">Silakan pilih peserta berikutnya.</td></tr>`;
+                document.getElementById('total-skor-juri').innerText = "0";
+            }
+        }
+
+        function renderForm() {
+            const tbody = document.getElementById('tbody-form-pbb');
+            const trHeadCol = document.getElementById('header-skor-kolom');
+            tbody.innerHTML = '';
+            trHeadCol.innerHTML = '';
+
+            for(let i=1; i<=6; i++) {
+                let th = document.createElement('th');
+                th.className = "p-2 w-14 text-indigo-900 font-bold";
+                th.innerText = `Skor ${i}`;
+                trHeadCol.appendChild(th);
+            }
+
+            let total = 0;
+            if(!databaseNilai[activeJuriId]) databaseNilai[activeJuriId] = {};
+            let jData = databaseNilai[activeJuriId];
+            let isLocked = databaseNilai.isLocked || false;
+
+            let grouped = {};
+            masterSoal.forEach(item => {
+                let kat = item.kategori || "LAINNYA";
+                if(!grouped[kat]) grouped[kat] = [];
+                grouped[kat].push(item);
+            });
+
+            let itemNumber = 1;
+            for(let kat in grouped) {
+                let trCat = document.createElement('tr');
+                trCat.className = 'bg-slate-100/80 text-slate-900 font-bold';
+                trCat.innerHTML = `<td colspan="8" class="p-3 uppercase text-xs sm:text-sm tracking-wider text-indigo-950 font-extrabold border-y border-slate-200">${kat}</td>`;
+                tbody.appendChild(trCat);
+
+                grouped[kat].forEach((item) => {
+                    let currentVal = jData[item.id];
+                    
+                    if (currentVal !== undefined && !isNaN(currentVal)) {
+                        total += Number(currentVal);
+                    }
+
+                    let tds = '';
+                    item.scores.forEach((score) => {
+                        let isSelected = (currentVal !== undefined && Number(currentVal) === Number(score));
+                        let disabled = isLocked ? 'disabled' : '';
+                        
+                        // Gaya tombol chip/card modern menggantikan Radio Button
+                        let btnStyle = isSelected 
+                            ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-500/30 scale-105 border-indigo-600' 
+                            : 'bg-slate-100 hover:bg-indigo-50 text-slate-700 font-bold border-slate-200 hover:border-indigo-300';
+                            
+                        if(isLocked) btnStyle += ' opacity-60 cursor-not-allowed';
+
+                        tds += `<td class="p-1.5 text-center">
+                            <button type="button" ${disabled} onclick="updateNilai('${item.id}', ${score})" class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl border transition-all duration-150 flex items-center justify-center text-sm sm:text-base mx-auto active:scale-95 ${btnStyle}">
+                                ${score}
+                            </button>
+                        </td>`;
+                    });
+
+                    for (let i = item.scores.length; i < 6; i++) {
+                        tds += `<td class="p-1.5 text-center text-slate-300">-</td>`;
+                    }
+
+                    let tr = document.createElement('tr');
+                    tr.className = itemNumber % 2 === 0 ? 'bg-white hover:bg-slate-50/50 transition' : 'bg-slate-50/30 hover:bg-slate-50/50 transition';
+                    tr.innerHTML = `
+                        <td class="p-3 text-center font-extrabold text-slate-400">${itemNumber}</td>
+                        <td class="p-3 font-extrabold text-slate-800">${item.nama}</td>
+                        ${tds}
+                    `;
+                    tbody.appendChild(tr);
+                    itemNumber++;
+                });
+            }
+
+            let p1Jml = Number(document.getElementById('pengurangan_1_jml').value) || 0;
+            let p1Poin = Number(document.getElementById('pengurangan_1_poin').value) || 0;
+            let p2Jml = Number(document.getElementById('pengurangan_2_jml').value) || 0;
+            let p2Poin = Number(document.getElementById('pengurangan_2_poin').value) || 0;
+            let p3Jml = Number(document.getElementById('pengurangan_3_jml').value) || 0;
+            let p3Poin = Number(document.getElementById('pengurangan_3_poin').value) || 0;
+
+            let totalPengurangan = (p1Jml * p1Poin) + (p2Jml * p2Poin) + (p3Jml * p3Poin);
+            let skorAkhir = total - totalPengurangan;
+
+            document.getElementById('total-skor-juri').innerText = skorAkhir;
+        }
+
+        window.updateNilai = async function(id, val) {
+            if(databaseNilai.isLocked) {
+                alert("Nilai sudah dikunci!");
+                return;
+            }
+            if(!databaseNilai[activeJuriId]) databaseNilai[activeJuriId] = {};
+            databaseNilai[activeJuriId][id] = Number(val);
+            renderForm();
+            await autoSimpanKeFirebase();
+        }
+
+        window.autoSavePengurangan = async function() {
+            if(databaseNilai.isLocked) return;
+            renderForm();
+            await autoSimpanKeFirebase();
+        }
+
+        async function autoSimpanKeFirebase() {
+            if(!selectedPesertaKey) return;
+            const indicator = document.getElementById('save-indicator');
+            indicator.className = "text-xs font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-4 py-2 rounded-2xl animate-pulse";
+            indicator.innerText = "⏳ Menyimpan...";
+            
+            try {
+                databaseNilai.pengurangan = {
+                    p1_jml: document.getElementById('pengurangan_1_jml').value,
+                    p1_poin: document.getElementById('pengurangan_1_poin').value,
+                    p2_jml: document.getElementById('pengurangan_2_jml').value,
+                    p2_poin: document.getElementById('pengurangan_2_poin').value,
+                    p3_jml: document.getElementById('pengurangan_3_jml').value,
+                    p3_poin: document.getElementById('pengurangan_3_poin').value,
+                };
+                await setDoc(doc(db, "lkbb_penilaian", selectedPesertaKey), databaseNilai, { merge: true });
+                indicator.className = "text-xs font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl";
+                indicator.innerText = "⚡ Tersimpan Otomatis";
+            } catch (e) {
+                console.error(e);
+                indicator.className = "text-xs font-extrabold text-rose-400 bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-2xl";
+                indicator.innerText = "❌ Gagal Simpan";
+            }
+        }
+
+        cekSesiLogin();
+    </script>
+</body>
+</html>

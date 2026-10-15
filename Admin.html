@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Kelola Kategori, Soal, Juri & Nilai Peserta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-area, #print-area * {
+                visibility: visible;
+            }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 1cm;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50/70 via-slate-50 to-amber-50/50 text-slate-800 min-h-full pb-16 selection:bg-indigo-500 selection:text-white">
+
+    <!-- BAGIAN 1: KOTAK LOGIN (Tampil jika belum login) -->
+    <div id="login-section" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-100 p-8 space-y-6 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="text-center space-y-2">
+                <div class="inline-block bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-black p-3 rounded-2xl shadow-md shadow-indigo-500/20 text-lg tracking-wider mb-2">ADMIN</div>
+                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Login Panel Admin</h2>
+                <p class="text-xs text-slate-500">Masukkan username dan password admin terdaftar.</p>
+            </div>
+
+            <!-- Form Login yang sudah disinkronkan dengan Firebase -->
+            <form id="form-login-admin" onsubmit="prosesLoginAdmin(event)" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Username Admin:</label>
+                    <input type="text" id="login-user" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition text-sm" placeholder="Masukkan username">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Password:</label>
+                    <input type="password" id="login-pass" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" id="btn-submit-login" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold p-4 rounded-2xl transition shadow-lg shadow-indigo-500/25 active:scale-[0.99] text-sm flex items-center justify-center gap-2 cursor-pointer">
+                    <span>🔐 Masuk ke Dashboard</span>
+                </button>
+            </form>
+            <div class="text-center">
+                <a href="Admin resigiter.html" class="text-xs text-indigo-600 hover:text-indigo-800 font-bold transition">✨ Belum punya akun? Daftar di sini</a>
+            </div>
+            <div class="text-center pt-2 border-t border-slate-100">
+                <a href="pendaftaran.html" class="text-xs text-slate-400 hover:text-indigo-600 font-bold transition">&larr; Kembali ke Menu Peserta</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- BAGIAN 2: DASHBOARD UTAMA ADMIN (Disembunyikan sebelum login) -->
+    <div id="dashboard-section" class="hidden">
+        <!-- HEADER CERAH -->
+        <header class="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shadow-sm no-print">
+            <div class="max-w-5xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-3.5">
+                    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-black p-2.5 rounded-2xl shadow-md shadow-indigo-500/20 text-base tracking-wider">PANITIA</div>
+                    <div>
+                        <h1 class="font-extrabold text-base sm:text-lg text-slate-900 leading-tight">KELOLA LKBB</h1>
+                        <p class="text-xs text-indigo-600 font-bold">Dashboard Admin & Manajemen Sistem</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 items-center flex-wrap">
+                    <a href="pendaftaran.html" class="text-xs bg-slate-100 hover:bg-slate-200 border border-slate-200 px-3.5 py-2 rounded-xl text-slate-700 font-bold transition shadow-sm">Menu Peserta</a>
+                    <a href="juri.html" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-xl font-bold transition shadow-sm shadow-indigo-500/20">Buka Form Juri</a>
+                    <a href="rekap.html" class="text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 px-3.5 py-2 rounded-xl font-bold transition shadow-sm shadow-amber-500/20">Lembar Rekap &rarr;</a>
+                    <button onclick="logoutAdmin()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3.5 py-2 rounded-xl font-bold transition shadow-sm">🔒 Logout</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-6 no-print">
+            
+            <!-- BAGIAN 0: TAMBAH & KELOLA AKUN JURI -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 sm:p-8 space-y-5">
+                <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <h2 class="text-base sm:text-lg font-extrabold text-indigo-600 uppercase tracking-tight">Kelola Akun Juri</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Daftarkan kredensial akun serta cetak kartu login untuk juri lapangan.</p>
+                    </div>
+                    <button onclick="cetakSemuaKartuJuri()" class="self-start sm:self-auto text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-extrabold border border-indigo-200 px-3.5 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5">
+                        🎴 Cetak Semua Kartu Juri
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">ID Juri (Contoh: juri_1):</label>
+                        <input type="text" id="adm-juri-id" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="juri_1">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Password Juri:</label>
+                        <input type="text" id="adm-juri-pass" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="rahasia123">
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Nama Lengkap Juri & Keterangan:</label>
+                    <input type="text" id="adm-juri-nama" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="Juri 1 - Penilaian PBB Murni">
+                </div>
+                <button onclick="tambahAkunJuri()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold p-4 rounded-2xl transition shadow-lg shadow-indigo-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
+                    <span>👤 Simpan Akun Juri Baru ke Firebase</span>
+                </button>
+
+                <div class="pt-4 border-t border-slate-100">
+                    <h3 class="font-extrabold text-xs uppercase tracking-wider text-slate-500 mb-3">Daftar Akun Juri Aktif:</h3>
+                    <div id="list-juri-container" class="space-y-2">
+                        <p class="text-slate-400 text-sm">Memuat daftar juri...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BAGIAN 1: FORM TAMBAH KATEGORI / BUTIR SOAL -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 sm:p-8 space-y-5">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="text-base sm:text-lg font-extrabold text-amber-600 uppercase tracking-tight">Tambah Butir Penilaian / Gerakan</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Konfigurasi gerakan, nomor urut, serta opsi nilai pembanding.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Nama Kategori Besar:</label>
+                        <input type="text" id="adm-kategori" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 uppercase placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" placeholder="PBB MURNI">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Nomor Urut Tampil:</label>
+                        <input type="number" id="adm-urutan" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" value="1" min="1">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Nama Gerakan / Item Penilaian:</label>
+                        <input type="text" id="adm-nama" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 uppercase placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" placeholder="LANGKAH TEGAP">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Pilihan / Opsi Skor (Pisahkan dengan koma):</label>
+                        <input type="text" id="adm-skor" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" value="22, 24, 26, 28, 30, 32" placeholder="22, 24, 26, 28, 30, 32">
+                    </div>
+                    <button onclick="tambahItemPenilaian()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-extrabold p-4 rounded-2xl transition shadow-lg shadow-amber-500/25 active:scale-[0.99] flex items-center justify-center gap-2 mt-2">
+                        <span>💾 Simpan Butir Penilaian ke Firebase</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BAGIAN 2: DAFTAR SOAL & DRAG AND DROP -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 sm:p-8 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-2">
+                    <h2 class="text-base sm:text-lg font-extrabold text-slate-800 uppercase tracking-tight">Daftar Kategori & Soal</h2>
+                    <span class="text-xs text-amber-700 font-extrabold bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 shadow-sm">💡 Tarik (Drag & Drop) untuk ubah urutan</span>
+                </div>
+                <div id="list-kategori-container" class="space-y-4">
+                    <p class="text-slate-400 text-sm">Memuat soal...</p>
+                </div>
+            </div>
+
+            <!-- BAGIAN 3: KONTROL HAPUS / RESET NILAI JURI & PESERTA -->
+            <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 sm:p-8 space-y-4">
+                <div class="border-b border-slate-100 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1">
+                    <h2 class="text-base sm:text-lg font-extrabold text-rose-600 uppercase tracking-tight">Kontrol Hasil Penilaian & Peserta</h2>
+                    <span class="text-xs text-slate-500">Reset nilai atau hapus data peserta</span>
+                </div>
+                <div id="list-peserta-nilai-container" class="space-y-2">
+                    <p class="text-slate-400 text-sm">Memuat data peserta...</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- AREA KHUSUS CETAK KARTU JURI -->
+    <div id="print-area" class="hidden"></div>
+
+    <!-- POP-UP MODAL EDIT SEKALIGUS -->
+    <div id="modal-edit" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-5 animate-in fade-in zoom-in duration-200 relative overflow-hidden">
+            <div class="absolute -top-20 -right-20 w-40 h-40 bg-amber-200/40 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3 relative z-10">
+                <h3 class="font-extrabold text-base sm:text-lg text-amber-600 uppercase tracking-tight">Edit Butir Penilaian Sekaligus</h3>
+                <button onclick="tutupModalEdit()" class="text-slate-400 hover:text-slate-600 font-bold text-xl w-8 h-8 rounded-full flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition">&times;</button>
+            </div>
+            
+            <input type="hidden" id="edit-id">
+            
+            <div class="space-y-4 relative z-10">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">NAMA KATEGORI BESAR:</label>
+                        <input type="text" id="edit-kategori" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-2xl font-bold uppercase text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    </div>
+                    <div class="space-y-1.5">
+                        <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">NOMOR URUT TAMPIL:</label>
+                        <input type="number" id="edit-urutan" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-2xl font-bold text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition" min="1">
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">NAMA GERAKAN / ITEM PENILAIAN:</label>
+                    <input type="text" id="edit-nama" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-2xl font-bold uppercase text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">PILIHAN / OPSI SKOR (Pisahkan dengan koma):</label>
+                    <input type="text" id="edit-skor" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-2xl font-bold text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-2 relative z-10">
+                <button onclick="tutupModalEdit()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3.5 rounded-2xl transition text-sm">Batal</button>
+                <button onclick="simpanEditSekaligus()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3.5 rounded-2xl transition text-sm shadow-lg shadow-amber-500/25">💾 Simpan Perubahan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SKRIP UTAMA LOGIN DAN FIREBASE -->
+    <script>
+        // Cek status sesi saat halaman dimuat
+        window.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem("admin_logged_in") === "true") {
+                bukaDashboard();
+            }
+        });
+
+        function bukaDashboard() {
+            document.getElementById("login-section").classList.add("hidden");
+            document.getElementById("dashboard-section").classList.remove("hidden");
+            
+            // Panggil fungsi pemuat data jika sudah terdefinisi di modul bawah
+            if(typeof muatDaftarJuri === "function") muatDaftarJuri();
+            if(typeof muatDaftarSoal === "function") muatDaftarSoal();
+            if(typeof muatDaftarNilaiPeserta === "function") muatDaftarNilaiPeserta();
+        }
+
+        function logoutAdmin() {
+            if(confirm("Keluar dari sesi admin?")) {
+                localStorage.removeItem("admin_logged_in");
+                localStorage.removeItem("admin_user");
+                localStorage.removeItem("admin_nama");
+                location.reload(); 
+            }
+        }
+    </script>
+
+    <!-- MODUL FIREBASE UNTUK PROSES LOGIN KE FIRESTORE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAY-bJOK6QLFhpi5lQMLGNxsxIe8JNUvpg",
+            authDomain: "tryout-kebun-ilmu.firebaseapp.com",
+            projectId: "tryout-kebun-ilmu",
+            storageBucket: "tryout-kebun-ilmu.firebasestorage.app",
+            messagingSenderId: "497636674894",
+            appId: "1:497636674894:web:82fb38cb615d8bf7b1a21f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let dataJuriCache = [];
+
+        // --- PROSES LOGIN ADMIN MENGECEK KE FIRESTORE (AKUN_ADMIN) ---
+        window.prosesLoginAdmin = async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById("login-user").value.trim().toLowerCase();
+            const pass = document.getElementById("login-pass").value;
+            const btnSubmit = document.getElementById("btn-submit-login");
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span>🌀 Memeriksa Akun...</span>`;
+
+            try {
+                const docRef = doc(db, "akun_admin", username);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    alert("Akun Tidak Ditemukan: Username admin tidak terdaftar di sistem.");
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>🔐 Masuk ke Dashboard</span>`;
+                    return;
+                }
+
+                const userData = docSnap.data();
+
+                if (userData.password !== pass) {
+                    alert("Password Salah: Password yang Anda masukkan tidak sesuai.");
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>🔐 Masuk ke Dashboard</span>`;
+                    return;
+                }
+
+                // Simpan Sesi Login
+                localStorage.setItem("admin_logged_in", "true");
+                localStorage.setItem("admin_user", username);
+                localStorage.setItem("admin_nama", userData.namaPanitia || username);
+
+                // Buka Dashboard
+                bukaDashboard();
+
+            } catch (err) {
+                console.error("Error Login Admin:", err);
+                alert("Gagal Login: Terjadi kesalahan sistem: " + err.message);
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>🔐 Masuk ke Dashboard</span>`;
+            }
+        };
+
+        // --- MANAJEMEN AKUN JURI ---
+        window.tambahAkunJuri = async function() {
+            const juriId = document.getElementById('adm-juri-id').value.trim().toLowerCase();
+            const juriPass = document.getElementById('adm-juri-pass').value.trim();
+            const juriNama = document.getElementById('adm-juri-nama').value.trim();
+
+            if(!juriId || !juriPass || !juriNama) {
+                alert("Semua kolom akun juri harus diisi!");
+                return;
+            }
+
+            try {
+                await setDoc(doc(db, "akun_juri", juriId), {
+                    idJuri: juriId,
+                    namaJuri: juriNama,
+                    password: juriPass
+                });
+                alert(`Akun Juri (${juriId}) berhasil disimpan! ✅`);
+                document.getElementById('adm-juri-id').value = '';
+                document.getElementById('adm-juri-pass').value = '';
+                document.getElementById('adm-juri-nama').value = '';
+                muatDaftarJuri();
+            } catch(e) {
+                console.error(e);
+                alert("Gagal menyimpan akun juri ke Firebase.");
+            }
+        }
+
+        window.muatDaftarJuri = async function() {
+            const container = document.getElementById('list-juri-container');
+            if (!container) return;
+            container.innerHTML = '';
+            dataJuriCache = [];
+
+            try {
+                const querySnapshot = await getDocs(collection(db, "akun_juri"));
+                if(querySnapshot.empty) {
+                    container.innerHTML = `<p class="text-slate-400 text-sm">Belum ada akun juri terdaftar.</p>`;
+                    return;
+                }
+
+                let html = `<div class="space-y-2">`;
+                querySnapshot.forEach(docSnap => {
+                    let data = docSnap.data();
+                    let jId = docSnap.id;
+                    let displayNama = data.namaJuri || data.nama || jId;
+                    
+                    dataJuriCache.push({ idJuri: jId, namaJuri: displayNama, password: data.password });
+
+                    html += `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/60 text-sm gap-2 shadow-sm">
+                        <div>
+                            <span class="font-extrabold text-indigo-700">${jId}</span> - <span class="font-semibold text-slate-800">${displayNama}</span> <span class="text-xs text-slate-400 font-mono">(Pass: ${data.password})</span>
+                        </div>
+                        <div class="flex gap-2 self-end sm:self-auto">
+                            <button onclick="cetakKartuJuriSingle('${jId}')" class="text-indigo-700 font-extrabold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition border border-indigo-200 shadow-sm">🎴 Cetak Kartu</button>
+                            <button onclick="hapusAkunJuri('${jId}')" class="text-rose-600 font-extrabold text-xs bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl transition border border-rose-100">Hapus</button>
+                        </div>
+                    </div>`;
+                });
+                html += `</div>`;
+                container.innerHTML = html;
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = `<p class="text-rose-500 text-sm">Gagal memuat daftar juri.</p>`;
+            }
+        }
+
+        window.hapusAkunJuri = async function(id) {
+            if(confirm(`Yakin ingin menghapus akun juri ${id}?`)) {
+                try {
+                    await deleteDoc(doc(db, "akun_juri", id));
+                    alert("Akun juri berhasil dihapus!");
+                    muatDaftarJuri();
+                } catch(e) {
+                    console.error(e);
+                    alert("Gagal menghapus akun juri.");
+                }
+            }
+        }
+
+        // --- FUNGSI CETAK KARTU JURI ---
+        window.cetakSemuaKartuJuri = function() {
+            if(dataJuriCache.length === 0) {
+                alert("Belum ada data juri untuk dicetak!");
+                return;
+            }
+            renderDanCetakKartu(dataJuriCache);
+        }
+
+        window.cetakKartuJuriSingle = function(idJuri) {
+            const targetJuri = dataJuriCache.filter(j => j.idJuri === idJuri);
+            if(targetJuri.length === 0) {
+                alert("Data juri tidak ditemukan!");
+                return;
+            }
+            renderDanCetakKartu(targetJuri);
+        }
+
+        function renderDanCetakKartu(listJuri) {
+            const printArea = document.getElementById('print-area');
+            printArea.classList.remove('hidden');
+
+            let cardHtml = `<div class="grid grid-cols-2 gap-6 p-4">`;
+
+            listJuri.forEach(juri => {
+                cardHtml += `
+                <div class="border-2 border-indigo-900 rounded-3xl p-5 bg-white shadow-none flex flex-col justify-between space-y-4 page-break-inside-avoid relative overflow-hidden">
+                    <div class="flex items-center justify-between border-b-2 border-slate-200 pb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="bg-indigo-900 text-white font-black px-3 py-1 rounded-xl text-xs tracking-wider">LKBB</div>
+                            <div>
+                                <h1 class="font-black text-xs text-slate-900 leading-tight uppercase">KARTU AKSES JURI</h1>
+                                <p class="text-[10px] text-indigo-600 font-bold">PANITIA PENILAIAN LAPANGAN</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded-lg">OFFICIAL</span>
+                    </div>
+
+                    <div class="space-y-3 my-2">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Nama Juri / Tugas:</span>
+                            <span class="text-sm font-black text-slate-900 uppercase block">${juri.namaJuri}</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-slate-500 block">ID Juri (Username)</span>
+                                <span class="font-mono font-black text-indigo-700 text-sm">${juri.idJuri}</span>
+                            </div>
+                            <div>
+                                <span class="text-[9px] uppercase font-bold text-slate-500 block">Password</span>
+                                <span class="font-mono font-black text-slate-900 text-sm">${juri.password}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-dashed border-slate-300 pt-2 flex items-center justify-between text-[9px] text-slate-500 font-medium">
+                        <span>Sistem Penilaian Real-time LKBB</span>
+                        <span class="font-bold text-slate-700">Simpan kartu ini selama lomba</span>
+                    </div>
+                </div>`;
+            });
+
+            cardHtml += `</div>`;
+            printArea.innerHTML = cardHtml;
+
+            setTimeout(() => {
+                window.print();
+                printArea.classList.add('hidden');
+                printArea.innerHTML = '';
+            }, 300);
+        }
+
+        // --- MANAJEMEN MASTER SOAL & DRAG AND DROP ---
+        window.tambahItemPenilaian = async function() {
+            const kategori = document.getElementById('adm-kategori').value.trim().toUpperCase();
+            const nama = document.getElementById('adm-nama').value.trim().toUpperCase();
+            const skorStr = document.getElementById('adm-skor').value.trim();
+            const urutan = Number(document.getElementById('adm-urutan').value) || 1;
+
+            if(!kategori || !nama || !skorStr) {
+                alert("Semua kolom harus diisi!");
+                return;
+            }
+
+            const scores = skorStr.split(',').map(s => Number(s.trim()));
+
+            try {
+                await addDoc(collection(db, "master_soal"), {
+                    kategori: kategori,
+                    nama: nama,
+                    scores: scores,
+                    urutan: urutan
+                });
+                alert("Berhasil menambahkan butir penilaian! ✅");
+                document.getElementById('adm-nama').value = '';
+                muatDaftarSoal();
+            } catch(e) {
+                console.error("Gagal:", e);
+                alert("Gagal menyimpan ke Firebase!");
+            }
+        }
+
+        window.muatDaftarSoal = async function() {
+            const container = document.getElementById('list-kategori-container');
+            if (!container) return;
+            container.innerHTML = '';
+            try {
+                const querySnapshot = await getDocs(collection(db, "master_soal"));
+                if(querySnapshot.empty) {
+                    container.innerHTML = `<p class="text-slate-400 text-sm">Belum ada kategori/soal yang dibuat.</p>`;
+                    return;
+                }
+
+                let allItems = [];
+                querySnapshot.forEach((docSnap) => {
+                    allItems.push({ id: docSnap.id, ...docSnap.data() });
+                });
+
+                allItems.sort((a, b) => (a.urutan || 99) - (b.urutan || 99));
+
+                let dataMap = {};
+                allItems.forEach(item => {
+                    let kat = item.kategori || "LAINNYA";
+                    if(!dataMap[kat]) dataMap[kat] = [];
+                    dataMap[kat].push(item);
+                });
+
+                for (let kat in dataMap) {
+                    let div = document.createElement('div');
+                    div.className = "border border-slate-200/80 rounded-2xl p-4 sm:p-5 bg-slate-50/70 space-y-3 shadow-sm";
+                    let html = `<h3 class="font-extrabold text-amber-700 uppercase tracking-tight text-sm">${kat}</h3><ul class="space-y-2 sortable-list" data-kategori="${kat}">`;
+                    
+                    dataMap[kat].forEach(item => {
+                        html += `<li draggable="true" data-id="${item.id}" data-urutan="${item.urutan || 1}" class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-3.5 rounded-2xl border border-slate-200/80 shadow-sm cursor-grab active:cursor-grabbing hover:border-amber-400 transition gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="text-slate-300 font-extrabold select-none text-base">☰</span>
+                                <div>
+                                    <span class="font-extrabold text-slate-800">${item.nama}</span> 
+                                    <div class="text-xs text-slate-500 mt-0.5">Opsi Skor: <span class="font-semibold text-slate-700">${item.scores.join(', ')}</span></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 self-end sm:self-auto">
+                                <span class="text-xs bg-slate-100 font-extrabold px-2.5 py-1 rounded-xl text-slate-600 border border-slate-200/60">Urut: ${item.urutan || 1}</span>
+                                <button onclick="bukaModalEdit('${item.id}')" class="text-indigo-600 font-extrabold text-xs bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition border border-indigo-100">Edit</button>
+                                <button onclick="hapusSoal('${item.id}')" class="text-rose-600 font-extrabold text-xs bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-xl transition border border-rose-100">Hapus</button>
+                            </div>
+                        </li>`;
+                    });
+                    html += `</ul>`;
+                    div.innerHTML = html;
+                    container.appendChild(div);
+                }
+
+                InisialisasiDragAndDrop();
+            } catch(e) {
+                console.error("Gagal memuat:", e);
+            }
+        }
+
+        window.bukaModalEdit = async function(id) {
+            try {
+                const docRef = doc(db, "master_soal", id);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    alert("Data soal tidak ditemukan!");
+                    return;
+                }
+
+                const data = docSnap.data();
+
+                document.getElementById('edit-id').value = id;
+                document.getElementById('edit-kategori').value = data.kategori || '';
+                document.getElementById('edit-nama').value = data.nama || '';
+                document.getElementById('edit-skor').value = data.scores ? data.scores.join(', ') : '';
+                document.getElementById('edit-urutan').value = data.urutan || 1;
+
+                document.getElementById('modal-edit').classList.remove('hidden');
+            } catch (e) {
+                console.error("Gagal membuka data:", e);
+                alert("Terjadi kesalahan saat memuat data.");
+            }
+        }
+
+        window.tutupModalEdit = function() {
+            document.getElementById('modal-edit').classList.add('hidden');
+        }
+
+        window.simpanEditSekaligus = async function() {
+            const id = document.getElementById('edit-id').value;
+            const kategoriBaru = document.getElementById('edit-kategori').value.trim().toUpperCase();
+            const namaBaru = document.getElementById('edit-nama').value.trim().toUpperCase();
+            const skorBaruStr = document.getElementById('edit-skor').value.trim();
+            const urutanBaru = Number(document.getElementById('edit-urutan').value) || 1;
+
+            if(!kategoriBaru || !namaBaru || !skorBaruStr) {
+                alert("Semua kolom pada form pop-up harus diisi!");
+                return;
+            }
+
+            const scoresArray = skorBaruStr.split(',').map(s => Number(s.trim()));
+
+            try {
+                const docRef = doc(db, "master_soal", id);
+                await updateDoc(docRef, {
+                    kategori: kategoriBaru,
+                    nama: namaBaru,
+                    scores: scoresArray,
+                    urutan: urutanBaru
+                });
+
+                alert("Semua data berhasil diperbarui sekaligus! ✅");
+                tutupModalEdit();
+                muatDaftarSoal();
+            } catch (e) {
+                console.error("Gagal menyimpan:", e);
+                alert("Terjadi kesalahan saat menyimpan perubahan.");
+            }
+        }
+
+        function InisialisasiDragAndDrop() {
+            const lists = document.querySelectorAll('.sortable-list');
+            lists.forEach(list => {
+                let draggingItem = null;
+
+                list.addEventListener('dragstart', (e) => {
+                    draggingItem = e.target.closest('li');
+                    setTimeout(() => draggingItem.classList.add('opacity-40', 'border-dashed', 'border-amber-500'), 0);
+                });
+
+                list.addEventListener('dragend', async (e) => {
+                    if(draggingItem) {
+                        draggingItem.classList.remove('opacity-40', 'border-dashed', 'border-amber-500');
+                        
+                        const items = list.querySelectorAll('li');
+                        let updates = [];
+                        
+                        items.forEach(async (li, index) => {
+                            let id = li.getAttribute('data-id');
+                            let urutanBaru = index + 1;
+                            updates.push(updateDoc(doc(db, "master_soal", id), { urutan: urutanBaru }));
+                        });
+
+                        await Promise.all(updates);
+                        muatDaftarSoal();
+                    }
+                    draggingItem = null;
+                });
+
+                list.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    const afterElement = getDragAfterElement(list, e.clientY);
+                    const currentItem = document.querySelector('.opacity-40');
+                    if (currentItem) {
+                        if (afterElement == null) {
+                            list.appendChild(currentItem);
+                        } else {
+                            list.insertBefore(currentItem, afterElement);
+                        }
+                    }
+                });
+            });
+        }
+
+        function getDragAfterElement(container, y) {
+            const draggableElements = [...container.querySelectorAll('li:not(.opacity-40)')];
+            return draggableElements.reduce((closest, child) => {
+                const box = child.getBoundingClientRect();
+                const offset = y - box.top - box.height / 2;
+                if (offset < 0 && offset > closest.offset) {
+                    return { offset: offset, element: child };
+                } else {
+                    return { offset: closest.offset, element: closest.element };
+                }
+            }, { offset: Number.NEGATIVE_INFINITY }).element;
+        }
+
+        window.hapusSoal = async function(id) {
+            if(confirm("Yakin ingin menghapus butir soal ini?")) {
+                await deleteDoc(doc(db, "master_soal", id));
+                muatDaftarSoal();
+            }
+        }
+
+        // --- MANAJEMEN NILAI & PESERTA DI BAWAH ---
+        window.muatDaftarNilaiPeserta = async function() {
+            const container = document.getElementById('list-peserta-nilai-container');
+            if (!container) return;
+            try {
+                const querySnapshot = await getDocs(collection(db, "daftar_peserta"));
+                if(querySnapshot.empty) {
+                    container.innerHTML = `<p class="text-slate-400 text-sm">Belum ada peserta terdaftar.</p>`;
+                    return;
+                }
+
+                let pesertaList = [];
+                querySnapshot.forEach(docSnap => {
+                    pesertaList.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                pesertaList.sort((a, b) => Number(a.noUrut) - Number(b.noUrut));
+
+                let html = `<div class="space-y-2 max-h-72 overflow-y-auto pr-1">`;
+                for(let p of pesertaList) {
+                    html += `<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50/80 p-3.5 rounded-2xl border border-slate-200/60 text-sm gap-2 shadow-sm">
+                        <div>
+                            <span class="font-extrabold text-amber-700">No. ${p.noUrut}</span> - <span class="font-extrabold uppercase text-slate-800">${p.asalSekolah}</span>
+                        </div>
+                        <div class="flex gap-2 w-full sm:w-auto justify-end">
+                            <button onclick="hapusNilaiPeserta('${p.noUrut}', '${p.asalSekolah}')" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold text-xs px-3 py-2 rounded-xl transition shadow-sm">
+                                🔄 Reset Nilai
+                            </button>
+                            <button onclick="hapusDataPeserta('${p.id}', '${p.noUrut}', '${p.asalSekolah}')" class="bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs px-3 py-2 rounded-xl transition shadow-sm">
+                                🗑️ Hapus Peserta
+                            </button>
+                        </div>
+                    </div>`;
+                }
+                html += `</div>`;
+                container.innerHTML = html;
+            } catch(e) {
+                console.error(e);
+                container.innerHTML = `<p class="text-rose-500 text-sm">Gagal memuat data peserta.</p>`;
+            }
+        }
+
+        window.hapusNilaiPeserta = async function(noUrut, asalSekolah) {
+            if(confirm(`⚠️ Reset seluruh hasil penilaian juri untuk No. Urut ${noUrut} (${asalSekolah})?`)) {
+                try {
+                    await deleteDoc(doc(db, "lkbb_penilaian", `peserta_${noUrut}`));
+                    alert("Nilai juri berhasil direset! ✅");
+                } catch(e) {
+                    console.error(e);
+                    alert("Gagal mereset nilai.");
+                }
+            }
+        }
+
+        window.hapusDataPeserta = async function(docId, noUrut, asalSekolah) {
+            if(confirm(`⚠️ PERINGATAN: Hapus peserta No. ${noUrut} (${asalSekolah}) beserta seluruh nilai jurinya secara PERMANEN?`)) {
+                try {
+                    await deleteDoc(doc(db, "daftar_peserta", docId));
+                    try {
+                        await deleteDoc(doc(db, "lkbb_penilaian", `peserta_${noUrut}`));
+                    } catch(err) {}
+
+                    alert("Peserta berhasil dihapus permanen! ✅");
+                    muatDaftarNilaiPeserta();
+                } catch(e) {
+                    console.error(e);
+                    alert("Gagal menghapus data peserta.");
+                }
+            }
+        }
+    </script>
+</body>
+</html>

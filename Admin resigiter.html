@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-950">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Admin - LKBB Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(241, 245, 249, 0.5); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-800 antialiased min-h-screen selection:bg-indigo-500 selection:text-white">
+
+    <!-- Container Utama Split Screen -->
+    <div class="min-h-screen w-full flex flex-col lg:flex-row overflow-hidden bg-slate-950">
+        
+        <!-- ================= BAGIAN 1: LAYAR KIRI (VISUAL HERO & BRANDING) ================= -->
+        <div class="lg:w-1/2 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 text-white p-6 sm:p-10 lg:p-16 flex flex-col justify-between relative overflow-hidden min-h-[420px] lg:min-h-screen border-b lg:border-b-0 lg:border-r border-indigo-900/50">
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-indigo-600/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 right-0 w-80 h-80 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-gradient-to-tr from-indigo-500 via-indigo-600 to-amber-400 rounded-2xl flex items-center justify-center font-black text-xl text-slate-950 shadow-xl shadow-indigo-500/20 border border-white/20">
+                        LK
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-lg tracking-wider text-white leading-none">LKBB SYSTEM</h1>
+                        <p class="text-[10px] text-indigo-300 font-bold tracking-widest uppercase mt-1">Admin Management Hub</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 backdrop-blur-md shadow-inner">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400"></span> Panel Panitia v2.0
+                </span>
+            </div>
+
+            <div class="relative z-10 my-8 lg:my-auto space-y-6 max-w-xl">
+                <div class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-400/20 to-amber-500/10 border border-amber-400/30 text-amber-300 px-4 py-1.5 rounded-2xl text-xs font-extrabold uppercase tracking-wider backdrop-blur-md">
+                    <span>⚡</span> Akses Administrator Lomba
+                </div>
+                <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+                    Kelola Lomba <br class="hidden sm:inline"/>
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-amber-200 to-indigo-100">
+                        Presisi, Cepat & Akurat.
+                    </span>
+                </h2>
+                <p class="text-sm sm:text-base text-slate-300 leading-relaxed font-medium">
+                    Masuk atau daftarkan akun administrator untuk mengelola kategori gerakan, juri penilaian lapangan, serta rekapitulasi nilai secara real-time.
+                </p>
+            </div>
+
+            <div class="relative z-10 border-t border-white/10 pt-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+                <p>© 2026 Sistem Manajemen LKBB. All rights reserved.</p>
+                <div class="flex items-center gap-2 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Firebase Active
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= BAGIAN 2: LAYAR KANAN (TAB SWITCHER & FORM) ================= -->
+        <div class="lg:w-1/2 bg-slate-50 p-6 sm:p-10 lg:p-16 flex flex-col justify-center items-center relative overflow-y-auto max-h-screen">
+            <div class="w-full max-w-md space-y-6 my-auto py-6">
+                
+                <!-- Tab Switcher (Registrasi / Login) -->
+                <div class="bg-slate-200/80 p-1.5 rounded-2xl flex items-center gap-1 shadow-inner">
+                    <button type="button" id="tab-btn-register" onclick="switchTab('register')" class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-200 bg-indigo-600 text-white shadow-md">
+                        ✨ Registrasi Baru
+                    </button>
+                    <button type="button" id="tab-btn-login" onclick="switchTab('login')" class="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900">
+                        🔑 Login Admin
+                    </button>
+                </div>
+
+                <!-- TAB 1: FORM REGISTRASI -->
+                <div id="section-register" class="space-y-6 transition-all duration-300">
+                    <div class="space-y-1.5 text-left">
+                        <div class="inline-flex items-center gap-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 font-extrabold px-3 py-1 rounded-xl text-xs">
+                            <span>🔒</span> Registrasi Khusus Panitia
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Buat Akun Admin</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Lengkapi formulir untuk mengaktifkan akses dashboard admin.</p>
+                    </div>
+
+                    <form id="form-register-admin" onsubmit="prosesRegistrasiAdmin(event)" class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="reg-nama">Nama Lengkap Panitia</label>
+                            <input type="text" id="reg-nama" required class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm" placeholder="Contoh: Budi Santoso">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="reg-user">Username Admin</label>
+                            <input type="text" id="reg-user" required class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm" placeholder="Contoh: admin_budi">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="reg-passcode">
+                                Kode Otorisasi Panitia <span class="text-indigo-600 font-extrabold lowercase text-[11px]">(default: LKBB2026)</span>
+                            </label>
+                            <input type="text" id="reg-passcode" required class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-mono font-bold text-indigo-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm uppercase" placeholder="LKBB2026">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="reg-pass">Password Baru</label>
+                            <input type="password" id="reg-pass" required minlength="6" class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm" placeholder="Minimal 6 karakter">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="reg-confirm-pass">Konfirmasi Password</label>
+                            <input type="password" id="reg-confirm-pass" required class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm" placeholder="Ulangi password">
+                        </div>
+
+                        <button type="submit" id="btn-submit-reg" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold p-4 rounded-2xl transition shadow-xl text-sm flex items-center justify-center gap-2 mt-4 cursor-pointer">
+                            <span>✨ Daftarkan Akun Admin Baru</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- TAB 2: FORM LOGIN -->
+                <div id="section-login" class="space-y-6 hidden transition-all duration-300">
+                    <div class="space-y-1.5 text-left">
+                        <div class="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-700 font-extrabold px-3 py-1 rounded-xl text-xs">
+                            <span>🔑</span> Portal Masuk Panitia
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Masuk Admin</h2>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Gunakan username dan password terdaftar untuk masuk.</p>
+                    </div>
+
+                    <form id="form-login-admin" onsubmit="prosesLoginAdmin(event)" class="space-y-4">
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="login-user">Username Admin</label>
+                            <input type="text" id="login-user" required class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm" placeholder="Masukkan username">
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label class="block font-bold text-xs uppercase tracking-wider text-slate-600" for="login-pass">Password</label>
+                            <input type="password" id="login-pass" required class="w-full bg-white border border-slate-200 px-4 py-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition text-sm shadow-sm" placeholder="Masukkan password">
+                        </div>
+
+                        <button type="submit" id="btn-submit-login" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold p-4 rounded-2xl transition shadow-xl text-sm flex items-center justify-center gap-2 mt-4 cursor-pointer">
+                            <span>🚀 Masuk ke Dashboard</span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 flex flex-col gap-2 text-center">
+                    <a href="pendaftaran.html" class="text-xs text-slate-500 hover:text-indigo-600 font-bold transition">
+                        ← Kembali ke Menu Peserta / Pendaftaran
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Notification Modal -->
+    <div id="custom-modal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-200">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" id="modal-box">
+            <div class="flex items-center gap-3">
+                <div id="modal-icon" class="w-10 h-10 rounded-2xl flex items-center justify-center text-xl bg-indigo-50 text-indigo-600">⚠️</div>
+                <div>
+                    <h3 id="modal-title" class="font-extrabold text-base text-slate-900">Pemberitahuan</h3>
+                    <p id="modal-subtitle" class="text-xs text-slate-500 font-medium">Sistem Manajemen LKBB</p>
+                </div>
+            </div>
+            <p id="modal-message" class="text-sm text-slate-700 leading-relaxed font-medium">Pesan pemberitahuan.</p>
+            <button type="button" onclick="closeModal()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-4 rounded-xl text-xs transition">
+                Mengerti
+            </button>
+        </div>
+    </div>
+
+    <!-- SCRIPT FIREBASE & LOGIKA APLIKASI -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAY-bJOK6QLFhpi5lQMLGNxsxIe8JNUvpg",
+            authDomain: "tryout-kebun-ilmu.firebaseapp.com",
+            projectId: "tryout-kebun-ilmu",
+            storageBucket: "tryout-kebun-ilmu.firebasestorage.app",
+            messagingSenderId: "497636674894",
+            appId: "1:497636674894:web:82fb38cb615d8bf7b1a21f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.showModal = function(title, message, icon = '⚠️', isSuccess = false) {
+            const modal = document.getElementById('custom-modal');
+            const box = document.getElementById('modal-box');
+            const iconEl = document.getElementById('modal-icon');
+            
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+            iconEl.innerText = icon;
+
+            if (isSuccess) {
+                iconEl.className = "w-10 h-10 rounded-2xl flex items-center justify-center text-xl bg-emerald-50 text-emerald-600";
+            } else {
+                iconEl.className = "w-10 h-10 rounded-2xl flex items-center justify-center text-xl bg-indigo-50 text-indigo-600";
+            }
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-95');
+            box.classList.add('scale-100');
+        };
+
+        window.closeModal = function() {
+            const modal = document.getElementById('custom-modal');
+            const box = document.getElementById('modal-box');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-100');
+            box.classList.add('scale-95');
+        };
+
+        window.switchTab = function(tabName) {
+            const regSection = document.getElementById('section-register');
+            const loginSection = document.getElementById('section-login');
+            const regBtn = document.getElementById('tab-btn-register');
+            const loginBtn = document.getElementById('tab-btn-login');
+
+            if (tabName === 'register') {
+                regSection.classList.remove('hidden');
+                loginSection.classList.add('hidden');
+                regBtn.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-200 bg-indigo-600 text-white shadow-md";
+                loginBtn.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900";
+            } else {
+                loginSection.classList.remove('hidden');
+                regSection.classList.add('hidden');
+                loginBtn.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-200 bg-emerald-600 text-white shadow-md";
+                regBtn.className = "flex-1 py-2.5 px-4 rounded-xl font-bold text-xs transition-all duration-200 text-slate-600 hover:text-slate-900";
+            }
+        };
+
+        // Submit Registrasi
+        window.prosesRegistrasiAdmin = async function(e) {
+            e.preventDefault();
+
+            const nama = document.getElementById("reg-nama").value.trim();
+            const username = document.getElementById("reg-user").value.trim().toLowerCase();
+            const passcode = document.getElementById("reg-passcode").value.trim().toUpperCase();
+            const pass = document.getElementById("reg-pass").value;
+            const confirmPass = document.getElementById("reg-confirm-pass").value;
+            const btnSubmit = document.getElementById("btn-submit-reg");
+
+            if (passcode !== "LKBB2026") {
+                showModal("Akses Ditolak", "Kode Otorisasi Panitia Salah!", "🔒", false);
+                return;
+            }
+
+            if (pass !== confirmPass) {
+                showModal("Password Tidak Cocok", "Konfirmasi password tidak sesuai.", "⚠️", false);
+                return;
+            }
+
+            if (pass.length < 6) {
+                showModal("Password Pendek", "Password minimal 6 karakter.", "⚠️", false);
+                return;
+            }
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `Memproses Registrasi...`;
+
+            try {
+                const docRef = doc(db, "akun_admin", username);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    showModal("Username Terpakai", "Username admin sudah terdaftar!", "⚠️", false);
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>✨ Daftarkan Akun Admin Baru</span>`;
+                    return;
+                }
+
+                await setDoc(docRef, {
+                    namaPanitia: nama,
+                    username: username,
+                    password: pass,
+                    role: "admin",
+                    createdAt: new Date().toISOString()
+                });
+
+                localStorage.setItem("admin_logged_in", "true");
+                localStorage.setItem("admin_user", username);
+                localStorage.setItem("admin_nama", nama);
+
+                showModal("Registrasi Berhasil!", "Akun admin berhasil terdaftar. Mengarahkan...", "✅", true);
+
+                setTimeout(() => {
+                    window.location.href = "Admin.html";
+                }, 1200);
+
+            } catch (err) {
+                console.error("Error Registrasi Admin:", err);
+                showModal("Gagal Mendaftar", "Kesalahan sistem: " + err.message, "❌", false);
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>✨ Daftarkan Akun Admin Baru</span>`;
+            }
+        };
+
+        // Submit Login
+        window.prosesLoginAdmin = async function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById("login-user").value.trim().toLowerCase();
+            const pass = document.getElementById("login-pass").value;
+            const btnSubmit = document.getElementById("btn-submit-login");
+
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `Memeriksa Akun...`;
+
+            try {
+                const docRef = doc(db, "akun_admin", username);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    showModal("Akun Tidak Ditemukan", "Username admin tidak terdaftar.", "❌", false);
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>🚀 Masuk ke Dashboard</span>`;
+                    return;
+                }
+
+                const userData = docSnap.data();
+
+                if (userData.password !== pass) {
+                    showModal("Password Salah", "Password tidak sesuai.", "🔒", false);
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>🚀 Masuk ke Dashboard</span>`;
+                    return;
+                }
+
+                localStorage.setItem("admin_logged_in", "true");
+                localStorage.setItem("admin_user", username);
+                localStorage.setItem("admin_nama", userData.namaPanitia || username);
+
+                showModal("Login Berhasil!", "Mengarahkan ke Dashboard Admin...", "✅", true);
+
+                setTimeout(() => {
+                    window.location.href = "Admin.html";
+                }, 1000);
+
+            } catch (err) {
+                console.error("Error Login Admin:", err);
+                showModal("Gagal Login", "Kesalahan sistem: " + err.message, "❌", false);
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>🚀 Masuk ke Dashboard</span>`;
+            }
+        };
+    </script>
+</body>
+</html>
