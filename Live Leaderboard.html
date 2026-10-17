@@ -30,6 +30,9 @@
                 </div>
             </div>
             <div class="flex gap-2 items-center flex-wrap">
+                <a href="rekap.html" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 px-3.5 py-2 rounded-xl font-bold transition shadow-sm">
+                    &larr; Lembar Rekap
+                </a>
                 <button onclick="window.print()" class="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl font-bold transition shadow-sm">
                     🖨️ Cetak Leaderboard
                 </button>
@@ -58,7 +61,7 @@
                 <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl font-bold">⚡</div>
                 <div>
                     <span class="text-xs text-slate-400 font-bold uppercase block">Status Sistem</span>
-                    <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 inline-block mt-0.5">● Live Sinkronisasi</span>
+                    <span class="text-xs font-black text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 inline-block mt-0.5 animate-pulse">● Live Instant Sync</span>
                 </div>
             </div>
             <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-white shadow-xl shadow-slate-200/50 flex items-center gap-4">
@@ -74,7 +77,7 @@
         <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-5 sm:p-8 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3 flex-wrap gap-2">
                 <h2 class="text-base sm:text-lg font-extrabold text-slate-900 uppercase tracking-tight">Papan Peringkat & Perolehan Nilai Akhir</h2>
-                <span class="text-xs text-slate-500 font-medium">Tersinkronisasi otomatis dengan rekapitulasi juri lapangan</span>
+                <span class="text-xs text-emerald-600 font-bold">⚡ Terhubung secara Live tanpa jeda</span>
             </div>
 
             <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
@@ -89,7 +92,7 @@
                         </tr>
                     </thead>
                     <tbody id="leaderboard-body" class="divide-y divide-slate-100">
-                        <tr><td colspan="5" class="p-8 text-slate-400 font-medium">Memuat data peringkat...</td></tr>
+                        <tr><td colspan="5" class="p-8 text-slate-400 font-medium">Memuat data peringkat real-time...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -115,10 +118,10 @@
         </div>
     </div>
 
-    <!-- SCRIPT FIREBASE & LOGIKA LEADERBOARD -->
+    <!-- SCRIPT FIREBASE & REALTIME LISTENER -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAY-bJOK6QLFhpi5lQMLGNxsxIe8JNUvpg",
@@ -135,135 +138,131 @@
         let globalDataDetail = {};
         let masterSoalCache = [];
         let daftarJuriCache = [];
+        let pesertaMapCache = {};
+        let unsubNilai = null;
 
-        async function muatMasterSoal() {
+        async function initLeaderboard() {
             try {
-                const querySnapshot = await getDocs(collection(db, "master_soal"));
+                // Muat master soal dan daftar juri sekali di awal
+                const [soalSnap, juriSnap, pesertaSnap] = await Promise.all([
+                    getDocs(collection(db, "master_soal")),
+                    getDocs(collection(db, "akun_juri")),
+                    getDocs(collection(db, "daftar_peserta"))
+                ]);
+
                 masterSoalCache = [];
-                querySnapshot.forEach(docSnap => {
+                soalSnap.forEach(docSnap => {
                     masterSoalCache.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                masterSoalCache.sort((a, b) => (a.urutan || 99) - (b.urutan || 99));
-            } catch(e) { console.error("Gagal muat master soal:", e); }
-        }
+                masterSoalCache.sort((a, b) => (a.urutanGlobal || 99) - (b.urutanGlobal || 99) || (a.urutanKategori || 99) - (b.urutanKategori || 99) || (a.urutan || 99) - (b.urutan || 99));
 
-        async function muatDaftarJuri() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "akun_juri"));
                 daftarJuriCache = [];
-                querySnapshot.forEach(docSnap => {
+                juriSnap.forEach(docSnap => {
                     let d = docSnap.data();
                     daftarJuriCache.push({ 
                         id: docSnap.id, 
                         namaJuri: d.namaJuri || d.nama || docSnap.id 
                     });
                 });
-            } catch(e) { 
-                console.error("Gagal muat daftar juri:", e);
-                daftarJuriCache = [];
-            }
-        }
 
-        async function muatLeaderboard() {
-            const tbody = document.getElementById('leaderboard-body');
-            const statTotal = document.getElementById('stat-total-peserta');
-            const statJuara = document.getElementById('stat-juara-satu');
-
-            try {
-                await muatMasterSoal();
-                await muatDaftarJuri();
-
-                const pesertaSnapshot = await getDocs(collection(db, "daftar_peserta"));
-                if (pesertaSnapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-slate-400 font-medium">Belum ada peserta terdaftar.</td></tr>`;
-                    statTotal.innerText = "0 Tim";
-                    return;
-                }
-
-                let pesertaMap = {};
-                pesertaSnapshot.forEach(docSnap => {
+                pesertaMapCache = {};
+                pesertaSnap.forEach(docSnap => {
                     let d = docSnap.data();
-                    pesertaMap[d.noUrut] = d.asalSekolah;
+                    pesertaMapCache[d.noUrut] = d.asalSekolah;
                 });
 
-                statTotal.innerText = Object.keys(pesertaMap).length + " Tim";
+                document.getElementById('stat-total-peserta').innerText = Object.keys(pesertaMapCache).length + " Tim";
 
-                const nilaiSnapshot = await getDocs(collection(db, "lkbb_penilaian"));
-                let nilaiAkhirPesertaMap = {};
-                globalDataDetail = {};
+                // Pasang listener real-time onSnapshot pada koleksi penilaian agar langsung sinkron tanpa delay
+                if (unsubNilai) unsubNilai();
+                unsubNilai = onSnapshot(collection(db, "lkbb_penilaian"), (snapshot) => {
+                    let nilaiAkhirPesertaMap = {};
+                    globalDataDetail = {};
 
-                nilaiSnapshot.forEach(docSnap => {
-                    let idDoc = docSnap.id;
-                    let dataNilai = docSnap.data();
-                    let noUrut = idDoc.replace('peserta_', '');
+                    snapshot.forEach(docSnap => {
+                        let idDoc = docSnap.id;
+                        let dataNilai = docSnap.data();
+                        let noUrut = idDoc.replace('peserta_', '');
 
-                    globalDataDetail[noUrut] = dataNilai;
+                        globalDataDetail[noUrut] = dataNilai;
 
-                    let totalKotor = 0;
-                    masterSoalCache.forEach(item => {
-                        daftarJuriCache.forEach(juri => {
-                            if (dataNilai[juri.id] && dataNilai[juri.id][item.id] !== undefined) {
-                                totalKotor += Number(dataNilai[juri.id][item.id]) || 0;
-                            }
+                        let totalKotor = 0;
+                        masterSoalCache.forEach(item => {
+                            daftarJuriCache.forEach(juri => {
+                                if (dataNilai[juri.id] && dataNilai[juri.id][item.id] !== undefined) {
+                                    totalKotor += Number(dataNilai[juri.id][item.id]) || 0;
+                                }
+                            });
                         });
+
+                        let p1Jml = Number(dataNilai.pengurangan?.p1_jml) || 0;
+                        let p1Poin = Number(dataNilai.pengurangan?.p1_poin ?? 30);
+                        let p2Jml = Number(dataNilai.pengurangan?.p2_jml) || 0;
+                        let p2Poin = Number(dataNilai.pengurangan?.p2_poin ?? 50);
+                        let p3Jml = Number(dataNilai.pengurangan?.p3_jml) || 0;
+                        let p3Poin = Number(dataNilai.pengurangan?.p3_poin ?? 20);
+
+                        let totalPengurangan = (p1Jml * p1Poin) + (p2Jml * p2Poin) + (p3Jml * p3Poin);
+                        let nilaiAkhir = totalKotor - totalPengurangan;
+
+                        nilaiAkhirPesertaMap[noUrut] = nilaiAkhir;
                     });
 
-                    let p1Jml = Number(dataNilai.pengurangan?.p1_jml) || 0;
-                    let p1Poin = Number(dataNilai.pengurangan?.p1_poin ?? 30);
-                    let p2Jml = Number(dataNilai.pengurangan?.p2_jml) || 0;
-                    let p2Poin = Number(dataNilai.pengurangan?.p2_poin ?? 50);
-                    let p3Jml = Number(dataNilai.pengurangan?.p3_jml) || 0;
-                    let p3Poin = Number(dataNilai.pengurangan?.p3_poin ?? 20);
-
-                    let totalPengurangan = (p1Jml * p1Poin) + (p2Jml * p2Poin) + (p3Jml * p3Poin);
-                    let nilaiAkhir = totalKotor - totalPengurangan;
-
-                    nilaiAkhirPesertaMap[noUrut] = nilaiAkhir;
-                });
-
-                let finalLeaderboard = [];
-                for (let noUrut in pesertaMap) {
-                    finalLeaderboard.push({
-                        noUrut: noUrut,
-                        asalSekolah: pesertaMap[noUrut],
-                        nilaiAkhir: nilaiAkhirPesertaMap[noUrut] || 0
-                    });
-                }
-
-                finalLeaderboard.sort((a, b) => b.nilaiAkhir - a.nilaiAkhir);
-
-                tbody.innerHTML = '';
-                if (finalLeaderboard.length > 0) {
-                    statJuara.innerText = `${finalLeaderboard[0].asalSekolah} (${finalLeaderboard[0].nilaiAkhir} Poin)`;
-                }
-
-                finalLeaderboard.forEach((item, index) => {
-                    let rank = index + 1;
-                    let badgeClass = "bg-slate-100 text-slate-700 font-extrabold";
-                    if (rank === 1) badgeClass = "bg-amber-400 text-slate-900 font-black shadow-md shadow-amber-400/30";
-                    else if (rank === 2) badgeClass = "bg-slate-300 text-slate-900 font-black";
-                    else if (rank === 3) badgeClass = "bg-amber-700/30 text-amber-900 font-black";
-
-                    let tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 transition";
-                    tr.innerHTML = `
-                        <td class="p-3.5"><span class="w-8 h-8 rounded-xl inline-flex items-center justify-center text-xs ${badgeClass}">${rank}</span></td>
-                        <td class="p-3.5 font-bold text-slate-600">${item.noUrut}</td>
-                        <td class="p-3.5 text-left px-4 font-extrabold text-slate-900">${item.asalSekolah}</td>
-                        <td class="p-3.5 font-black text-indigo-600 text-base">${item.nilaiAkhir}</td>
-                        <td class="p-3.5 no-print">
-                            <button onclick="bukaDetail('${item.noUrut}', '${item.asalSekolah.replace(/'/g, "\\'")}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-extrabold transition border border-indigo-200">
-                                📊 Detail
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
+                    renderTabelLeaderboard(nilaiAkhirPesertaMap);
                 });
 
             } catch (e) {
-                console.error("Gagal memuat leaderboard:", e);
-                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-rose-500 font-medium">Gagal memuat data peringkat dari server.</td></tr>`;
+                console.error("Gagal menginisialisasi leaderboard:", e);
+                document.getElementById('leaderboard-body').innerHTML = `<tr><td colspan="5" class="p-8 text-rose-500 font-medium">Gagal memuat data dari server.</td></tr>`;
             }
+        }
+
+        function renderTabelLeaderboard(nilaiAkhirPesertaMap) {
+            const tbody = document.getElementById('leaderboard-body');
+            const statJuara = document.getElementById('stat-juara-satu');
+
+            let finalLeaderboard = [];
+            for (let noUrut in pesertaMapCache) {
+                finalLeaderboard.push({
+                    noUrut: noUrut,
+                    asalSekolah: pesertaMapCache[noUrut],
+                    nilaiAkhir: nilaiAkhirPesertaMap[noUrut] || 0
+                });
+            }
+
+            finalLeaderboard.sort((a, b) => b.nilaiAkhir - a.nilaiAkhir);
+
+            tbody.innerHTML = '';
+            if (finalLeaderboard.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-slate-400 font-medium">Belum ada peserta terdaftar.</td></tr>`;
+                statJuara.innerText = "-";
+                return;
+            }
+
+            statJuara.innerText = `${finalLeaderboard[0].asalSekolah} (${finalLeaderboard[0].nilaiAkhir} Poin)`;
+
+            finalLeaderboard.forEach((item, index) => {
+                let rank = index + 1;
+                let badgeClass = "bg-slate-100 text-slate-700 font-extrabold";
+                if (rank === 1) badgeClass = "bg-amber-400 text-slate-900 font-black shadow-md shadow-amber-400/30";
+                else if (rank === 2) badgeClass = "bg-slate-300 text-slate-900 font-black";
+                else if (rank === 3) badgeClass = "bg-amber-700/30 text-amber-900 font-black";
+
+                let tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                tr.innerHTML = `
+                    <td class="p-3.5"><span class="w-8 h-8 rounded-xl inline-flex items-center justify-center text-xs ${badgeClass}">${rank}</span></td>
+                    <td class="p-3.5 font-bold text-slate-600">${item.noUrut}</td>
+                    <td class="p-3.5 text-left px-4 font-extrabold text-slate-900">${item.asalSekolah}</td>
+                    <td class="p-3.5 font-black text-indigo-600 text-base">${item.nilaiAkhir}</td>
+                    <td class="p-3.5 no-print">
+                        <button onclick="bukaDetail('${item.noUrut}', '${item.asalSekolah.replace(/'/g, "\\'")}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-xl text-xs font-extrabold transition border border-indigo-200">
+                            📊 Detail
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
         window.bukaDetail = function(noUrut, namaSekolah) {
@@ -349,8 +348,7 @@
             document.getElementById('modal-detail').classList.add('hidden');
         }
 
-        muatLeaderboard();
-        setInterval(muatLeaderboard, 10000);
+        initLeaderboard();
     </script>
 </body>
 </html>
