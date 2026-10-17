@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran Peserta - LKBB Murni Alfabet V</title>
+    <title>Pendaftaran Peserta & Manajemen - LKBB Murni Alfabet V</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -24,53 +24,74 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-50/70 via-slate-50 to-amber-50/50 text-slate-800 min-h-full pb-16 selection:bg-indigo-500 selection:text-white">
-    <!-- HEADER -->
-    <header class="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-50 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex justify-between items-center">
-            <div class="flex items-center gap-3.5 overflow-hidden">
-                <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-black p-2.5 rounded-2xl shadow-md shadow-indigo-500/25 text-base tracking-wider shrink-0">LKBB</div>
-                <div class="truncate">
-                    <h1 class="font-extrabold text-xs sm:text-lg text-slate-900 leading-tight truncate">PANITIA - LKBB MURNI ALFABET V</h1>
-                    <p class="text-[11px] sm:text-xs text-indigo-600 font-bold truncate">Manajemen Pendaftaran Peserta</p>
+<body class="bg-gradient-to-br from-indigo-50/60 via-slate-50 to-amber-50/40 text-slate-800 min-h-full pb-16 selection:bg-indigo-500 selection:text-white">
+    
+    <!-- TOAST NOTIFICATION CONTAINER (POJOK KANAN ATAS) -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <!-- HEADER MODERN -->
+    <header class="bg-white/85 backdrop-blur-md border-b border-slate-200/80 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex justify-between items-center flex-wrap gap-3">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white font-black p-2.5 rounded-2xl shadow-md shadow-indigo-500/20 text-xs tracking-wider">LKBB</div>
+                <div>
+                    <h1 class="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">PANITIA - LKBB MURNI ALFABET V</h1>
+                    <p class="text-[11px] sm:text-xs text-indigo-600 font-bold">Manajemen Pendaftaran & Kontrol Nilai Peserta</p>
                 </div>
+            </div>
+            <div>
+                <a href="Live Leaderboard.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl font-extrabold transition shadow-md shadow-slate-900/10 flex items-center gap-1.5">
+                    🏆 Live Leaderboard
+                </a>
             </div>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         
         <!-- FORM TAMBAH PESERTA -->
-        <div id="form-pendaftaran-container" class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-5 sm:p-8 space-y-5">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-1">
-                <h2 class="text-base sm:text-lg font-extrabold text-amber-600 uppercase tracking-tight">Tambah Peserta Lomba Baru</h2>
-                <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Pendaftaran Aktif</span>
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 sm:p-8 space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h2 class="text-sm sm:text-base font-extrabold text-amber-600 uppercase tracking-tight">Form Tambah Peserta Baru</h2>
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Pendaftaran Buka
+                </span>
             </div>
-            <div class="grid grid-cols-1 gap-5">
-                <div>
-                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600 mb-1.5">NO URUT PESERTA (Otomatis):</label>
-                    <input type="number" id="reg-no" readonly class="w-full bg-slate-100 text-slate-600 border border-slate-200 p-3.5 rounded-2xl font-bold cursor-not-allowed shadow-inner text-sm" placeholder="Memuat nomor...">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 items-end">
+                <div class="sm:col-span-3">
+                    <label class="block font-bold text-[11px] uppercase tracking-wider text-slate-500 mb-1.5">No. Urut (Otomatis):</label>
+                    <input type="number" id="reg-no" readonly class="w-full bg-slate-100 text-slate-600 border border-slate-200 p-3.5 rounded-2xl font-black text-center cursor-not-allowed shadow-inner text-sm" placeholder="...">
                 </div>
-                <div>
-                    <label class="block font-bold text-xs uppercase tracking-wider text-slate-600 mb-1.5">NAMA SEKOLAH / TIM:</label>
-                    <input type="text" id="reg-sekolah" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition text-sm" placeholder="Contoh: SMAN 3 BREBES B">
+                <div class="sm:col-span-6">
+                    <label class="block font-bold text-[11px] uppercase tracking-wider text-slate-500 mb-1.5">Nama Sekolah / Tim:</label>
+                    <input type="text" id="reg-sekolah" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition text-sm shadow-sm" placeholder="Contoh: SMAN 3 BREBES B">
                 </div>
-                <button onclick="tambahPeserta()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold p-3.5 sm:p-4 rounded-2xl transition shadow-lg shadow-amber-500/20 active:scale-[0.99] flex items-center justify-center gap-2 text-sm">
-                    <span>💾 Daftarkan Peserta ke Firebase</span>
-                </button>
+                <div class="sm:col-span-3">
+                    <button onclick="tambahPeserta()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold p-3.5 rounded-2xl transition shadow-md shadow-amber-500/20 active:scale-[0.98] text-xs sm:text-sm flex items-center justify-center gap-1.5">
+                        💾 Simpan Peserta
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- TABEL DAFTAR PESERTA -->
-        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-5 sm:p-8 space-y-5">
-            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 uppercase tracking-tight border-b border-slate-100 pb-3">Daftar Peserta Terdaftar</h2>
+        <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl shadow-slate-200/50 border border-white p-6 sm:p-8 space-y-5">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-100 pb-3 gap-3">
+                <div>
+                    <h2 class="text-sm sm:text-base font-extrabold text-slate-900 uppercase tracking-tight">Daftar Peserta Terdaftar</h2>
+                    <p class="text-xs text-slate-400">Kelola data peserta, cetak kartu, atau kontrol lembar nilai juri.</p>
+                </div>
+                <button onclick="konfirmasiResetSemuaPeserta()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5">
+                    🗑️ Hapus Semua Data Peserta
+                </button>
+            </div>
             <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
-                <table class="w-full border-collapse text-xs sm:text-sm text-center min-w-[320px]">
+                <table class="w-full border-collapse text-xs sm:text-sm text-center min-w-[380px]">
                     <thead>
-                        <tr class="bg-amber-500 text-slate-900 font-extrabold">
-                            <th class="p-3 w-16 sm:w-20">NO</th>
-                            <th class="p-3 text-left px-4">SEKOLAH / TIM</th>
-                            <th class="p-3 w-28 sm:w-36">AKSI</th>
+                        <tr class="bg-slate-900 text-white font-extrabold text-xs">
+                            <th class="p-3.5 w-16">NO</th>
+                            <th class="p-3.5 text-left px-4">SEKOLAH / TIM</th>
+                            <th class="p-3.5 w-56">AKSI KONTROL & KELOLA</th>
                         </tr>
                     </thead>
                     <tbody id="list-peserta" class="divide-y divide-slate-100">
@@ -83,7 +104,7 @@
 
     <!-- MODAL CETAK KARTU -->
     <div id="modal-cetak" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-5 sm:p-8 space-y-6 relative border border-white">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 relative border border-white">
             <div id="print-area" class="border-2 border-dashed border-slate-300 p-5 sm:p-6 rounded-2xl space-y-4 bg-slate-50 text-center">
                 <div class="border-b border-slate-200 pb-3">
                     <h3 class="font-black text-base sm:text-lg text-slate-900 uppercase tracking-tight">BUKTI PENDAFTARAN PESERTA</h3>
@@ -112,9 +133,49 @@
         </div>
     </div>
 
+    <!-- MODAL UNLOCK JURI MODERN -->
+    <div id="modal-unlock" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 sm:p-8 space-y-6 relative border border-white">
+            <div class="text-center space-y-1.5 border-b border-slate-100 pb-4">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto text-xl font-black shadow-inner">🔓</div>
+                <h3 class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Kontrol Unlock Nilai Juri</h3>
+                <p id="unlock-subtitle" class="text-xs text-slate-500 font-medium">Pilih juri yang ingin dibuka kuncinya untuk peserta ini.</p>
+            </div>
+            
+            <div id="unlock-list-container" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                <!-- List juri dimuat dinamis -->
+            </div>
+
+            <div class="pt-2">
+                <button onclick="tutupModalUnlock()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3.5 rounded-2xl transition text-xs sm:text-sm">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KONFIRMASI MODERN -->
+    <div id="modal-konfirmasi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 sm:p-8 space-y-5 text-center relative border border-white animate-in fade-in zoom-in duration-200">
+            <div id="konfirmasi-icon" class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl font-black shadow-inner">⚠️</div>
+            <div class="space-y-1.5">
+                <h3 id="konfirmasi-judul" class="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Konfirmasi Aksi</h3>
+                <p id="konfirmasi-pesan" class="text-xs text-slate-500 font-medium leading-relaxed">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
+            </div>
+            <div class="flex gap-2.5 pt-2">
+                <button id="btn-konfirmasi-ya" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-extrabold py-3 rounded-2xl transition shadow-md shadow-amber-500/20 text-xs sm:text-sm">
+                    Ya, Lanjutkan
+                </button>
+                <button onclick="tutupModalKonfirmasi()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold py-3 rounded-2xl transition text-xs sm:text-sm">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAY-bJOK6QLFhpi5lQMLGNxsxIe8JNUvpg",
@@ -129,6 +190,134 @@
         const db = getFirestore(app);
 
         let nextNoUrut = 1;
+
+        // Fungsi Toast Notification Ultra Modern (Biru & Merah Only)
+        function tampilkanNotif(judul, pesan, tipe = "info") {
+            const container = document.getElementById('toast-container');
+            
+            // Konversi tipe menjadi hanya biru (info/sukses) atau merah (bahaya/peringatan)
+            const isRed = (tipe === "bahaya" || tipe === "peringatan" || tipe === "error");
+            
+            const theme = isRed ? {
+                gradient: "from-red-600 via-rose-600 to-red-700",
+                shadow: "shadow-red-500/25",
+                border: "border-red-400/30",
+                glow: "bg-red-500/20",
+                badgeBg: "bg-red-500/30 text-red-100 border-red-300/30",
+                iconBg: "bg-red-500/20 text-red-200 border-red-400/30",
+                iconSvg: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>`,
+                tagText: "PERINGATAN",
+                progressBg: "bg-red-300/80"
+            } : {
+                gradient: "from-blue-600 via-indigo-600 to-blue-700",
+                shadow: "shadow-blue-500/25",
+                border: "border-blue-400/30",
+                glow: "bg-blue-500/20",
+                badgeBg: "bg-blue-500/30 text-blue-100 border-blue-300/30",
+                iconBg: "bg-blue-500/20 text-blue-200 border-blue-400/30",
+                iconSvg: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>`,
+                tagText: "INFORMASI",
+                progressBg: "bg-blue-300/80"
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `pointer-events-auto relative overflow-hidden bg-gradient-to-br ${theme.gradient} text-white border ${theme.border} shadow-2xl ${theme.shadow} backdrop-blur-xl rounded-2xl p-4 max-w-sm w-full transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] transform translate-x-full opacity-0 scale-95 flex flex-col gap-3 group`;
+            
+            toast.innerHTML = `
+                <!-- Background Ambient Glow -->
+                <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full ${theme.glow} blur-xl pointer-events-none"></div>
+                
+                <div class="flex items-start gap-3 relative z-10">
+                    <!-- Dynamic Glowing Icon -->
+                    <div class="flex-shrink-0 w-9 h-9 rounded-xl ${theme.iconBg} border flex items-center justify-center shadow-inner mt-0.5">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            ${theme.iconSvg}
+                        </svg>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 pr-2">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-md border ${theme.badgeBg}">
+                                ${theme.tagText}
+                            </span>
+                        </div>
+                        <h5 class="font-extrabold text-xs text-white tracking-tight leading-snug break-words">${judul}</h5>
+                        <p class="text-[11px] text-blue-50/90 font-medium leading-relaxed mt-0.5 break-words">${pesan}</p>
+                    </div>
+
+                    <!-- Close Button -->
+                    <button onclick="dismissToast(this.closest('.pointer-events-auto'))" class="flex-shrink-0 text-white/60 hover:text-white hover:bg-white/10 rounded-lg p-1 transition-all duration-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Animated Progress Bar -->
+                <div class="w-full bg-black/20 h-1 rounded-full overflow-hidden relative z-10">
+                    <div class="toast-progress h-full ${theme.progressBg} rounded-full w-full origin-left"></div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            // Smooth entrance animation
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-x-full', 'opacity-0', 'scale-95');
+                toast.classList.add('translate-x-0', 'opacity-100', 'scale-100');
+            });
+
+            // Progress bar animation using CSS transition
+            const progressBar = toast.querySelector('.toast-progress');
+            progressBar.style.transition = 'transform 3500ms linear';
+            requestAnimationFrame(() => {
+                progressBar.style.transform = 'scaleX(0)';
+            });
+
+            // Auto dismiss after 3.5s
+            const timer = setTimeout(() => {
+                dismissToast(toast);
+            }, 3500);
+
+            toast.dataset.timer = timer;
+        }
+
+        window.dismissToast = function(toast) {
+            if (!toast) return;
+            if (toast.dataset.timer) clearTimeout(parseInt(toast.dataset.timer));
+            
+            toast.classList.remove('translate-x-0', 'opacity-100', 'scale-100');
+            toast.classList.add('translate-x-full', 'opacity-0', 'scale-90');
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 400);
+        };
+
+        // Fungsi Modal Konfirmasi Modern
+        function bukaModalKonfirmasi(judul, pesan, icon, tombolClass, callback) {
+            document.getElementById('konfirmasi-judul').innerText = judul;
+            document.getElementById('konfirmasi-pesan').innerText = pesan;
+            document.getElementById('konfirmasi-icon').innerHTML = icon;
+            
+            const btnYa = document.getElementById('btn-konfirmasi-ya');
+            btnYa.className = `flex-1 font-extrabold py-3 rounded-2xl transition text-xs sm:text-sm ${tombolClass}`;
+            
+            const newBtnYa = btnYa.cloneNode(true);
+            btnYa.parentNode.replaceChild(newBtnYa, btnYa);
+            
+            newBtnYa.onclick = () => {
+                tutupModalKonfirmasi();
+                callback();
+            };
+
+            document.getElementById('modal-konfirmasi').classList.remove('hidden');
+        }
+
+        window.tutupModalKonfirmasi = function() {
+            document.getElementById('modal-konfirmasi').classList.add('hidden');
+        }
 
         async function hitungNomorUrutOtomatis() {
             try {
@@ -156,7 +345,7 @@
             const no = nextNoUrut;
 
             if(!sekolah) {
-                alert("Nama sekolah atau tim harus diisi!");
+                tampilkanNotif("Peringatan Input", "Nama sekolah atau tim harus diisi terlebih dahulu!", "peringatan");
                 return;
             }
 
@@ -165,13 +354,148 @@
                     noUrut: String(no),
                     asalSekolah: sekolah
                 });
-                alert("Peserta berhasil didaftarkan dengan No. Urut " + no + " ✅");
+                tampilkanNotif("Pendaftaran Berhasil", `Peserta ${sekolah} terdaftar dengan No. Urut ${no}`, "sukses");
                 document.getElementById('reg-sekolah').value = '';
                 await muatDaftarPeserta();
             } catch(e) {
                 console.error("Gagal mendaftar:", e);
-                alert("Gagal menyimpan ke Firebase!");
+                tampilkanNotif("Gagal Menyimpan", "Sistem gagal menyimpan data peserta ke database.", "bahaya");
             }
+        }
+
+        window.resetNilaiPeserta = function(noUrut, namaSekolah) {
+            bukaModalKonfirmasi(
+                "Reset Nilai Juri",
+                `Yakin ingin mereset/menghapus seluruh nilai juri untuk peserta "${namaSekolah}" (No. Urut ${noUrut})?`,
+                "🔄",
+                "bg-amber-500 hover:bg-amber-600 text-slate-900 shadow-md shadow-amber-500/20",
+                async () => {
+                    try {
+                        await deleteDoc(doc(db, "lkbb_penilaian", `peserta_${noUrut}`));
+                        tampilkanNotif("Nilai Direset", `Seluruh nilai peserta No. Urut ${noUrut} (${namaSekolah}) telah dikosongkan.`, "sukses");
+                    } catch(e) {
+                        console.error("Gagal mereset nilai peserta:", e);
+                        tampilkanNotif("Reset Gagal", "Gagal menghapus data nilai peserta di server.", "bahaya");
+                    }
+                }
+            );
+        }
+
+        window.bukaKunciNilai = async function(noUrut, namaSekolah) {
+            try {
+                const docRef = doc(db, "lkbb_penilaian", `peserta_${noUrut}`);
+                const docSnap = await getDoc(docRef);
+
+                if(!docSnap.exists()) {
+                    tampilkanNotif("Data Tidak Ditemukan", "Belum ada data penilaian atau kunci untuk peserta ini.", "info");
+                    return;
+                }
+
+                let data = docSnap.data();
+                let lockStatus = data.lockStatus || {};
+                let activeJuriKeys = Object.keys(lockStatus);
+
+                if(activeJuriKeys.length === 0) {
+                    tampilkanNotif("Status Nilai", "Belum ada juri yang mengunci nilai untuk peserta ini.", "info");
+                    return;
+                }
+
+                document.getElementById('unlock-subtitle').innerText = `Peserta: ${namaSekolah} (No. ${noUrut})`;
+                const container = document.getElementById('unlock-list-container');
+                container.innerHTML = '';
+
+                let btnSemua = document.createElement('button');
+                btnSemua.className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold p-3.5 rounded-2xl transition shadow-md shadow-indigo-600/20 text-xs sm:text-sm flex items-center justify-between px-4 mb-2";
+                btnSemua.innerHTML = `<span>🔓 Buka Kunci SEMUA Juri</span> <span class="bg-indigo-500 text-[10px] px-2 py-0.5 rounded-full">Global</span>`;
+                btnSemua.onclick = async () => {
+                    let updateObj = {};
+                    activeJuriKeys.forEach(jKey => {
+                        updateObj[`lockStatus.${jKey}`] = false;
+                    });
+                    await updateDoc(docRef, updateObj);
+                    tutupModalUnlock();
+                    tampilkanNotif("Unlock Berhasil", `Kunci nilai seluruh juri pada No. ${noUrut} (${namaSekolah}) telah dibuka!`, "sukses");
+                };
+                container.appendChild(btnSemua);
+
+                let div = document.createElement('div');
+                div.className = "text-[11px] font-bold text-slate-400 text-center uppercase tracking-wider py-1.5";
+                div.innerText = "Atau Buka Per Juri Spesifik:";
+                container.appendChild(div);
+
+                activeJuriKeys.forEach(jKey => {
+                    let isLocked = lockStatus[jKey];
+                    let btnJuri = document.createElement('button');
+                    btnJuri.className = "w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-800 font-bold p-3.5 rounded-2xl transition text-xs sm:text-sm flex items-center justify-between px-4";
+                    btnJuri.innerHTML = `
+                        <span class="font-extrabold uppercase">${jKey}</span>
+                        <span class="text-[11px] px-2.5 py-1 rounded-full ${isLocked ? 'bg-rose-50 text-rose-600 border border-rose-200' : 'bg-emerald-50 text-emerald-600 border border-emerald-200'}">
+                            ${isLocked ? '🔒 Terkunci' : '✅ Terbuka'}
+                        </span>
+                    `;
+                    btnJuri.onclick = async () => {
+                        let updateObj = {};
+                        updateObj[`lockStatus.${jKey}`] = false;
+                        await updateDoc(docRef, updateObj);
+                        tutupModalUnlock();
+                        tampilkanNotif("Unlock Berhasil", `Kunci nilai ${jKey} pada No. ${noUrut} telah dibuka!`, "sukses");
+                    };
+                    container.appendChild(btnJuri);
+                });
+
+                document.getElementById('modal-unlock').classList.remove('hidden');
+
+            } catch(e) {
+                console.error("Gagal membuka kunci:", e);
+                tampilkanNotif("Gagal Unlock", "Gagal memperbarui status kunci di server.", "bahaya");
+            }
+        }
+
+        window.tutupModalUnlock = function() {
+            document.getElementById('modal-unlock').classList.add('hidden');
+        }
+
+        window.hapusPeserta = function(noUrut, namaSekolah) {
+            bukaModalKonfirmasi(
+                "Hapus Peserta",
+                `Apakah Anda yakin ingin menghapus peserta "${namaSekolah}" (No. Urut ${noUrut}) dari daftar lomba?`,
+                "🗑️",
+                "bg-rose-500 hover:bg-rose-600 text-white shadow-md shadow-rose-500/20",
+                async () => {
+                    try {
+                        await deleteDoc(doc(db, "daftar_peserta", `peserta_${noUrut}`));
+                        tampilkanNotif("Peserta Terhapus", `Data peserta ${namaSekolah} berhasil dihapus.`, "bahaya");
+                        await muatDaftarPeserta();
+                    } catch(e) {
+                        console.error("Gagal menghapus peserta:", e);
+                        tampilkanNotif("Gagal Menghapus", "Sistem gagal menghapus data dari server.", "bahaya");
+                    }
+                }
+            );
+        }
+
+        window.konfirmasiResetSemuaPeserta = function() {
+            bukaModalKonfirmasi(
+                "Hapus Semua Data",
+                "PERINGATAN: Aksi ini akan menghapus SELURUH data peserta terdaftar dari database. Lanjutkan?",
+                "⚠️",
+                "bg-rose-500 hover:bg-rose-600 text-white shadow-md shadow-rose-500/20",
+                async () => {
+                    try {
+                        const querySnapshot = await getDocs(collection(db, "daftar_peserta"));
+                        let deletePromises = [];
+                        querySnapshot.forEach((docSnap) => {
+                            deletePromises.push(deleteDoc(docSnap.ref));
+                        });
+                        await Promise.all(deletePromises);
+                        tampilkanNotif("Pembersihan Selesai", "Seluruh data peserta terdaftar berhasil dikosongkan.", "bahaya");
+                        await muatDaftarPeserta();
+                    } catch(e) {
+                        console.error("Gagal mereset peserta:", e);
+                        tampilkanNotif("Reset Gagal", "Gagal menghapus seluruh data peserta.", "bahaya");
+                    }
+                }
+            );
         }
 
         window.cetakKartu = function(noUrut, asalSekolah) {
@@ -208,7 +532,12 @@
                         <td class="p-3.5 font-black text-amber-600">${d.noUrut}</td>
                         <td class="p-3.5 text-left px-4 font-bold text-slate-800 break-words">${d.asalSekolah}</td>
                         <td class="p-3.5">
-                            <button onclick="cetakKartu('${d.noUrut}', '${d.asalSekolah.replace(/'/g, "\\'")}')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 px-3 py-1.5 rounded-xl text-xs font-extrabold shadow-sm transition whitespace-nowrap">🖨️ Cetak</button>
+                            <div class="grid grid-cols-2 gap-1.5 max-w-[210px] mx-auto">
+                                <button onclick="cetakKartu('${d.noUrut}', '${d.asalSekolah.replace(/'/g, "\\'")}')" class="bg-amber-500 hover:bg-amber-600 text-slate-900 py-1.5 px-2 rounded-xl text-[11px] font-extrabold shadow-sm transition flex items-center justify-center gap-1">🖨️ Cetak</button>
+                                <button onclick="bukaKunciNilai('${d.noUrut}', '${d.asalSekolah.replace(/'/g, "\\'")}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 py-1.5 px-2 rounded-xl text-[11px] font-extrabold transition flex items-center justify-center gap-1">🔓 Unlock</button>
+                                <button onclick="resetNilaiPeserta('${d.noUrut}', '${d.asalSekolah.replace(/'/g, "\\'")}')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 py-1.5 px-2 rounded-xl text-[11px] font-extrabold transition flex items-center justify-center gap-1">🔄 Reset</button>
+                                <button onclick="hapusPeserta('${d.noUrut}', '${d.asalSekolah.replace(/'/g, "\\'")}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 py-1.5 px-2 rounded-xl text-[11px] font-extrabold transition flex items-center justify-center gap-1">🗑️ Hapus</button>
+                            </div>
                         </td>
                     `;
                     tbody.appendChild(tr);
