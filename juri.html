@@ -37,21 +37,17 @@
     <!-- MODAL KONFIRMASI ULTRA-MODERN (CUSTOM POP-UP) -->
     <div id="modal-konfirmasi" class="fixed inset-0 bg-slate-950/65 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 transition-all duration-300">
         <div class="bg-white/95 backdrop-blur-2xl rounded-3xl shadow-2xl shadow-slate-900/20 max-w-sm w-full p-6 sm:p-7 space-y-6 text-center relative border border-white/80 transform scale-95 opacity-0 transition-all duration-300 ease-out id-modal-box overflow-hidden">
-            <!-- Glow background overlay -->
             <div id="modal-glow" class="absolute -top-16 left-1/2 -translate-x-1/2 w-40 h-40 bg-indigo-500/15 rounded-full blur-2xl pointer-events-none transition-colors duration-300"></div>
 
-            <!-- Icon Wrapper -->
             <div id="konfirmasi-icon-wrapper" class="relative w-16 h-16 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-xl transition-all duration-300">
                 <span id="konfirmasi-icon" class="relative z-10 transition-transform duration-300 scale-110">🔒</span>
             </div>
 
-            <!-- Header & Body Text -->
             <div class="space-y-2 relative z-10">
                 <h3 id="konfirmasi-judul" class="font-extrabold text-xl text-slate-900 tracking-tight">Konfirmasi Aksi</h3>
                 <p id="konfirmasi-pesan" class="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed px-1">Apakah Anda yakin ingin melanjutkan tindakan ini?</p>
             </div>
 
-            <!-- Action Buttons -->
             <div class="flex gap-3 pt-2 relative z-10">
                 <button id="btn-konfirmasi-ya" class="flex-1 font-bold py-3.5 px-4 rounded-2xl transition-all duration-200 shadow-md active:scale-95 text-xs sm:text-sm">
                     Ya, Lanjutkan
@@ -74,22 +70,25 @@
                     <span>🏆 LKBB Murni Alfabet V</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">Login Panel Juri</h1>
-                <p class="text-xs sm:text-sm text-slate-500">Masukkan ID Juri dan Password yang diberikan panitia.</p>
+                <p class="text-xs sm:text-sm text-slate-500">Masukkan ID Juri dan Password yang terdaftar di database Admin.</p>
             </div>
 
-            <div class="space-y-5 relative z-10">
+            <form id="form-login-juri" onsubmit="prosesLoginJuri(event)" class="space-y-5 relative z-10">
                 <div class="space-y-1.5">
                     <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">ID Juri</label>
-                    <input type="text" id="login-id" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="Contoh: juri_1">
+                    <input type="text" id="login-id" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="Contoh: juri_1">
                 </div>
                 <div class="space-y-1.5">
                     <label class="block font-bold text-xs uppercase tracking-wider text-slate-600">Password</label>
-                    <input type="password" id="login-pass" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="••••••••">
+                    <input type="password" id="login-pass" required class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-2xl font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition" placeholder="••••••••">
                 </div>
-                <button onclick="prosesLogin()" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold p-4 rounded-2xl transition shadow-lg shadow-indigo-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
+                <button type="submit" id="btn-submit-juri" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-extrabold p-4 rounded-2xl transition shadow-lg shadow-indigo-500/25 active:scale-[0.99] flex items-center justify-center gap-2">
                     <span>Masuk ke Lembar Penilaian</span>
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                 </button>
+            </form>
+            <div class="text-center pt-2 border-t border-slate-100">
+                <a href="Admin.html" class="text-xs text-slate-400 hover:text-indigo-600 font-bold transition">&larr; Kembali ke Panel Admin</a>
             </div>
         </div>
     </div>
@@ -240,7 +239,6 @@
         let selectedPesertaKey = "";
         let unsubRealtime = null;
 
-        // FUNGSI TOAST NOTIFICATION MODERN (BIRU & MERAH)
         window.tampilkanNotif = function(judul, pesan, tipe = "info") {
             const container = document.getElementById('toast-container');
             if(!container) return;
@@ -290,18 +288,13 @@
             `;
 
             container.appendChild(toast);
-
-            requestAnimationFrame(() => {
-                toast.classList.remove('translate-x-12', 'opacity-0');
-            });
-
+            requestAnimationFrame(() => toast.classList.remove('translate-x-12', 'opacity-0'));
             setTimeout(() => {
                 toast.classList.add('translate-x-12', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
             }, 3500);
         };
 
-        // FUNGSI MODAL KONFIRMASI (POP-UP) MODERN
         window.bukaModalKonfirmasi = function(judul, pesan, icon, tombolText, tombolClass, callback) {
             document.getElementById('konfirmasi-judul').innerText = judul;
             document.getElementById('konfirmasi-pesan').innerText = pesan;
@@ -333,7 +326,6 @@
             const modal = document.getElementById('modal-konfirmasi');
             const box = modal.querySelector('.id-modal-box');
             modal.classList.remove('hidden');
-            
             setTimeout(() => {
                 box.classList.remove('scale-95', 'opacity-0');
                 box.classList.add('scale-100', 'opacity-100');
@@ -345,9 +337,7 @@
             const box = modal.querySelector('.id-modal-box');
             box.classList.remove('scale-100', 'opacity-100');
             box.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
+            setTimeout(() => modal.classList.add('hidden'), 200);
         };
 
         function cekSesiLogin() {
@@ -365,14 +355,14 @@
             }
         }
 
-        window.prosesLogin = async function() {
+        window.prosesLoginJuri = async function(e) {
+            e.preventDefault();
             const idJuri = document.getElementById('login-id').value.trim().toLowerCase();
             const passJuri = document.getElementById('login-pass').value.trim();
+            const btnSubmit = document.getElementById('btn-submit-juri');
 
-            if(!idJuri || !passJuri) {
-                tampilkanNotif("Perhatian", "ID Juri dan Password harus diisi terlebih dahulu!", "peringatan");
-                return;
-            }
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<span>🌀 Memeriksa Akun...</span>`;
 
             try {
                 const docRef = doc(db, "akun_juri", idJuri);
@@ -390,14 +380,20 @@
                         tampilkanNotif("Login Berhasil", `Selamat bertugas, ${activeJuriNama}!`, "info");
                         cekSesiLogin();
                     } else {
-                        tampilkanNotif("Login Gagal", "Password yang Anda masukkan salah. Silakan periksa kembali.", "bahaya");
+                        tampilkanNotif("Login Gagal", "Password salah.", "bahaya");
+                        btnSubmit.disabled = false;
+                        btnSubmit.innerHTML = `<span>Masuk ke Lembar Penilaian</span>`;
                     }
                 } else {
-                    tampilkanNotif("Tidak Ditemukan", "ID Juri tidak terdaftar dalam database.", "bahaya");
+                    tampilkanNotif("Tidak Ditemukan", "ID Juri tidak terdaftar di database Admin.", "bahaya");
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = `<span>Masuk ke Lembar Penilaian</span>`;
                 }
             } catch (e) {
-                console.error("Gagal login:", e);
-                tampilkanNotif("Kesalahan Sistem", "Gagal terhubung ke database server.", "bahaya");
+                console.error(e);
+                tampilkanNotif("Kesalahan Sistem", "Gagal terhubung ke database.", "bahaya");
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<span>Masuk ke Lembar Penilaian</span>`;
             }
         }
 
@@ -426,7 +422,9 @@
                 querySnapshot.forEach((docSnap) => {
                     masterSoal.push({ id: docSnap.id, ...docSnap.data() });
                 });
-                masterSoal.sort((a, b) => (a.urutan || 99) - (b.urutan || 99));
+                
+                // Urutan disamakan persis dengan halaman Admin (urutanGlobal -> urutanKategori -> urutan)
+                masterSoal.sort((a, b) => (a.urutanGlobal || 99) - (b.urutanGlobal || 99) || (a.urutanKategori || 99) - (b.urutanKategori || 99) || (a.urutan || 99) - (b.urutan || 99));
             } catch(e) { 
                 console.error(e); 
             }
@@ -471,7 +469,7 @@
             }
 
             selectedPesertaKey = `peserta_${noUrut}`;
-            const asalSekolah = selectedOpt.getAttribute('data-sekolah');
+            const asalSekolah = selectedOpt ? selectedOpt.getAttribute('data-sekolah') : '';
 
             if(unsubRealtime) unsubRealtime();
 
@@ -526,7 +524,6 @@
                     databaseNilai.isLocked = true;
 
                     await autoSimpanKeFirebase();
-                    
                     tampilkanNotif("Nilai Dikunci", "Nilai Anda untuk peserta ini berhasil dikunci secara permanen.", "info");
                     
                     document.getElementById('pilih-peserta').value = "";
@@ -549,7 +546,7 @@
             let soalJuriDizinkan = masterSoal.filter(item => aksesSoalJuri.includes(item.id));
 
             if(soalJuriDizinkan.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-bold">⚠️ Belum ada materi/soal yang diatur atau diizinkan untuk akun juri Anda oleh Admin.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-rose-500 font-bold">⚠️ Belum ada materi/soal yang diizinkan untuk akun juri Anda oleh Admin. Silakan hubungi Admin untuk mengatur hak akses soal.</td></tr>`;
                 document.getElementById('total-skor-juri').innerText = "0";
                 return;
             }
@@ -571,67 +568,75 @@
             }
 
             let totalColSpan = maxSkorLen + 2;
-
             let total = 0;
             if(!databaseNilai[activeJuriId]) databaseNilai[activeJuriId] = {};
             let jData = databaseNilai[activeJuriId];
             let isLocked = databaseNilai.isLocked || false;
 
-            let grouped = {};
+            // Pengelompokan berjenjang: Materi Global -> Kategori Besar (persis seperti struktur Admin)
+            let dataMap = {};
             soalJuriDizinkan.forEach(item => {
+                let mg = item.materiGlobal || "UMUM";
                 let kat = item.kategori || "LAINNYA";
-                if(!grouped[kat]) grouped[kat] = [];
-                grouped[kat].push(item);
+                if(!dataMap[mg]) dataMap[mg] = {};
+                if(!dataMap[mg][kat]) dataMap[mg][kat] = [];
+                dataMap[mg][kat].push(item);
             });
 
             let itemNumber = 1;
-            for(let kat in grouped) {
-                let trCat = document.createElement('tr');
-                trCat.className = 'bg-slate-100/80 text-slate-900 font-bold';
-                trCat.innerHTML = `<td colspan="${totalColSpan}" class="p-3 uppercase text-xs sm:text-sm tracking-wider text-indigo-950 font-extrabold border-y border-slate-200">🔸 Kategori: ${kat}</td>`;
-                tbody.appendChild(trCat);
+            for(let mg in dataMap) {
+                let trGlobal = document.createElement('tr');
+                trGlobal.className = 'bg-indigo-900 text-white font-extrabold';
+                trGlobal.innerHTML = `<td colspan="${totalColSpan}" class="p-3 uppercase text-xs sm:text-sm tracking-wider">📁 Materi Global: ${mg}</td>`;
+                tbody.appendChild(trGlobal);
 
-                grouped[kat].forEach((item) => {
-                    let currentVal = jData[item.id];
-                    
-                    if (currentVal !== undefined && !isNaN(currentVal)) {
-                        total += Number(currentVal);
-                    }
+                for(let kat in dataMap[mg]) {
+                    let trCat = document.createElement('tr');
+                    trCat.className = 'bg-slate-100 text-slate-900 font-bold';
+                    trCat.innerHTML = `<td colspan="${totalColSpan}" class="p-3 uppercase text-xs tracking-wider text-amber-700 font-extrabold border-y border-slate-200 pl-6">🔸 Kategori Besar: ${kat}</td>`;
+                    tbody.appendChild(trCat);
 
-                    let tds = '';
-                    if(item.scores && Array.isArray(item.scores)) {
-                        item.scores.forEach((score) => {
-                            let isSelected = (currentVal !== undefined && Number(currentVal) === Number(score));
-                            let disabled = isLocked ? 'disabled' : '';
-                            
-                            let btnStyle = isSelected 
-                                ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-500/30 scale-105 border-indigo-600' 
-                                : 'bg-slate-100 hover:bg-indigo-50 text-slate-700 font-bold border-slate-200 hover:border-indigo-300';
-                                
-                            if(isLocked) btnStyle += ' opacity-60 cursor-not-allowed';
-
-                            tds += `<td class="p-1 text-center">
-                                <button type="button" ${disabled} onclick="updateNilai('${item.id}', ${score})" class="btn-skor rounded-2xl border transition-all duration-150 flex items-center justify-center mx-auto active:scale-95 ${btnStyle}" title="Skor: ${score}">
-                                    ${score}
-                                </button>
-                            </td>`;
-                        });
-
-                        for (let i = item.scores.length; i < maxSkorLen; i++) {
-                            tds += `<td class="p-1 text-center text-slate-300">-</td>`;
+                    dataMap[mg][kat].forEach((item) => {
+                        let currentVal = jData[item.id];
+                        if (currentVal !== undefined && !isNaN(currentVal)) {
+                            total += Number(currentVal);
                         }
-                    }
 
-                    let tr = document.createElement('tr');
-                    tr.className = itemNumber % 2 === 0 ? 'bg-white hover:bg-slate-50/50 transition' : 'bg-slate-50/30 hover:bg-slate-50/50 transition';
-                    tr.innerHTML = `
-                        <td class="p-3 text-center font-extrabold text-slate-400">${itemNumber}</td>
-                        <td class="p-3 font-extrabold text-slate-800">${item.nama}</td>
-                        ${tds}
-                    `;
-                    tbody.appendChild(tr);
-                    itemNumber++;
-                });
+                        let tds = '';
+                        if(item.scores && Array.isArray(item.scores)) {
+                            item.scores.forEach((score) => {
+                                let isSelected = (currentVal !== undefined && Number(currentVal) === Number(score));
+                                let disabled = isLocked ? 'disabled' : '';
+                                
+                                let btnStyle = isSelected 
+                                    ? 'bg-indigo-600 text-white font-black shadow-md shadow-indigo-500/30 scale-105 border-indigo-600' 
+                                    : 'bg-slate-100 hover:bg-indigo-50 text-slate-700 font-bold border-slate-200 hover:border-indigo-300';
+                                    
+                                if(isLocked) btnStyle += ' opacity-60 cursor-not-allowed';
+
+                                tds += `<td class="p-1 text-center">
+                                    <button type="button" ${disabled} onclick="updateNilai('${item.id}', ${score})" class="btn-skor rounded-2xl border transition-all duration-150 flex items-center justify-center mx-auto active:scale-95 ${btnStyle}" title="Skor: ${score}">
+                                        ${score}
+                                    </button>
+                                </td>`;
+                            });
+
+                            for (let i = item.scores.length; i < maxSkorLen; i++) {
+                                tds += `<td class="p-1 text-center text-slate-300">-</td>`;
+                            }
+                        }
+
+                        let tr = document.createElement('tr');
+                        tr.className = itemNumber % 2 === 0 ? 'bg-white hover:bg-slate-50/50 transition' : 'bg-slate-50/30 hover:bg-slate-50/50 transition';
+                        tr.innerHTML = `
+                            <td class="p-3 text-center font-extrabold text-slate-400">${itemNumber}</td>
+                            <td class="p-3 font-extrabold text-slate-800">${item.nama}</td>
+                            ${tds}
+                        `;
+                        tbody.appendChild(tr);
+                        itemNumber++;
+                    });
+                }
             }
 
             let p1Jml = Number(document.getElementById('pengurangan_1_jml').value) || 0;
