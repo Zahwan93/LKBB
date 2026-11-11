@@ -765,81 +765,63 @@ window.hapusSoal = async function(id) {
 window.muatDaftarNilaiPeserta = async function() {
     // Fungsi kelola nilai peserta
 }
-// Fungsi untuk mencetak satu kartu juri
-window.cetakKartuJuriSingle = function(jId) {
-    let juriData = dataJuriCache.find(j => j.idJuri === jId);
-    if (!juriData) {
-        alert("Data juri tidak ditemukan.");
+// Tambahkan fungsi ini di dalam Admin.js
+
+window.cetakKartuJuriSingle = function(idJuri) {
+    const juri = dataJuriCache.find(j => j.idJuri === idJuri);
+    if (!juri) {
+        alert("Data juri tidak ditemukan di cache.");
         return;
     }
 
     const printArea = document.getElementById('print-area');
     printArea.innerHTML = `
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #fff;">
-            <div style="width: 350px; border: 2px dashed #4f46e5; border-radius: 16px; padding: 24px; font-family: 'Plus Jakarta Sans', sans-serif; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                <div style="background: #4f46e5; color: white; font-weight: 800; padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; letter-spacing: 1px;">KARTU LOGIN JURI LKBB</div>
-                <div style="margin-bottom: 12px;">
-                    <span style="font-size: 12px; color: #64748b; display: block; text-transform: uppercase;">ID Juri:</span>
-                    <strong style="font-size: 18px; color: #1e293b; font-family: monospace;">${juriData.idJuri}</strong>
-                </div>
-                <div style="margin-bottom: 12px;">
-                    <span style="font-size: 12px; color: #64748b; display: block; text-transform: uppercase;">Nama / Keterangan:</span>
-                    <strong style="font-size: 16px; color: #1e293b;">${juriData.namaJuri}</strong>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <span style="font-size: 12px; color: #64748b; display: block; text-transform: uppercase;">Password:</span>
-                    <strong style="font-size: 16px; color: #e11d48; font-family: monospace;">${juriData.password}</strong>
-                </div>
-                <div style="font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; pt-12px; margin-top: 12px;">
-                    Gunakan kredensial ini untuk login ke halaman juri lapangan.
-                </div>
+        <div style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; max-width: 400px; margin: 0 auto; border: 2px dashed #4f46e5; border-radius: 16px; background: #fff;">
+            <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: #4f46e5; font-size: 18px; font-weight: 800;">KARTU AKSES JURI LAPANGAN</h3>
+                <p style="margin: 4px 0 0 0; font-size: 12px; color: #64748b;">LKBB Murni Alfabet V</p>
+            </div>
+            <div style="font-size: 14px; space-y: 8px;">
+                <p style="margin: 6px 0;"><strong>ID Juri:</strong> <span style="font-family: monospace; color: #4f46e5; font-weight: bold;">${juri.idJuri}</span></p>
+                <p style="margin: 6px 0;"><strong>Nama Juri:</strong> ${juri.namaJuri}</p>
+                <p style="margin: 6px 0;"><strong>Password:</strong> <span style="font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${juri.password}</span></p>
+            </div>
+            <div style="margin-top: 20px; text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; pt-10px;">
+                Simpan kartu ini dan gunakan untuk login ke halaman penilaian juri.
             </div>
         </div>
     `;
-
-    printArea.classList.remove('hidden');
+    
     window.print();
-    printArea.classList.add('hidden');
-    printArea.innerHTML = '';
-};
+}
 
-// Fungsi untuk mencetak semua kartu juri sekaligus
 window.cetakSemuaKartuJuri = function() {
     if (!dataJuriCache || dataJuriCache.length === 0) {
-        alert("Belum ada data juri yang dimuat untuk dicetak.");
+        alert("Belum ada data juri yang dimuat.");
         return;
     }
 
     const printArea = document.getElementById('print-area');
-    let cardsHtml = `
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px; font-family: 'Plus Jakarta Sans', sans-serif;">
-    `;
-
+    let htmlCards = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 10px;">`;
+    
     dataJuriCache.forEach(juri => {
-        cardsHtml += `
-            <div style="border: 2px dashed #4f46e5; border-radius: 16px; padding: 20px; text-align: center; page-break-inside: avoid;">
-                <div style="background: #4f46e5; color: white; font-weight: 800; padding: 6px 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; letter-spacing: 1px;">KARTU LOGIN JURI LKBB</div>
-                <div style="margin-bottom: 10px;">
-                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase;">ID Juri:</span>
-                    <strong style="font-size: 16px; color: #1e293b; font-family: monospace;">${juri.idJuri}</strong>
+        htmlCards += `
+            <div style="font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; border: 2px dashed #4f46e5; border-radius: 16px; background: #fff; page-break-inside: avoid;">
+                <div style="text-align: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 12px;">
+                    <h3 style="margin: 0; color: #4f46e5; font-size: 16px; font-weight: 800;">KARTU AKSES JURI</h3>
+                    <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">LKBB Murni Alfabet V</p>
                 </div>
-                <div style="margin-bottom: 10px;">
-                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase;">Nama / Keterangan:</span>
-                    <strong style="font-size: 14px; color: #1e293b;">${juri.namaJuri}</strong>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase;">Password:</span>
-                    <strong style="font-size: 14px; color: #e11d48; font-family: monospace;">${juri.password}</strong>
+                <div style="font-size: 13px;">
+                    <p style="margin: 4px 0;"><strong>ID Juri:</strong> <span style="font-family: monospace; color: #4f46e5; font-weight: bold;">${juri.idJuri}</span></p>
+                    <p style="margin: 4px 0;"><strong>Nama:</strong> ${juri.namaJuri}</p>
+                    <p style="margin: 4px 0;"><strong>Pass:</strong> <span style="font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">${juri.password}</span></p>
                 </div>
             </div>
         `;
     });
-
-    cardsHtml += `</div>`;
-    printArea.innerHTML = cardsHtml;
-
-    printArea.classList.remove('hidden');
+    
+    htmlCards += `</div>`;
+    printArea.innerHTML = htmlCards;
+    
     window.print();
-    printArea.classList.add('hidden');
-    printArea.innerHTML = '';
-};
+}
