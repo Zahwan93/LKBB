@@ -765,3 +765,81 @@ window.hapusSoal = async function(id) {
 window.muatDaftarNilaiPeserta = async function() {
     // Fungsi kelola nilai peserta
 }
+// Fungsi untuk mencetak satu kartu juri
+window.cetakKartuJuriSingle = function(jId) {
+    let juriData = dataJuriCache.find(j => j.idJuri === jId);
+    if (!juriData) {
+        alert("Data juri tidak ditemukan.");
+        return;
+    }
+
+    const printArea = document.getElementById('print-area');
+    printArea.innerHTML = `
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #fff;">
+            <div style="width: 350px; border: 2px dashed #4f46e5; border-radius: 16px; padding: 24px; font-family: 'Plus Jakarta Sans', sans-serif; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <div style="background: #4f46e5; color: white; font-weight: 800; padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; letter-spacing: 1px;">KARTU LOGIN JURI LKBB</div>
+                <div style="margin-bottom: 12px;">
+                    <span style="font-size: 12px; color: #64748b; display: block; text-transform: uppercase;">ID Juri:</span>
+                    <strong style="font-size: 18px; color: #1e293b; font-family: monospace;">${juriData.idJuri}</strong>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <span style="font-size: 12px; color: #64748b; display: block; text-transform: uppercase;">Nama / Keterangan:</span>
+                    <strong style="font-size: 16px; color: #1e293b;">${juriData.namaJuri}</strong>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <span style="font-size: 12px; color: #64748b; display: block; text-transform: uppercase;">Password:</span>
+                    <strong style="font-size: 16px; color: #e11d48; font-family: monospace;">${juriData.password}</strong>
+                </div>
+                <div style="font-size: 10px; color: #94a3b8; border-top: 1px solid #e2e8f0; pt-12px; margin-top: 12px;">
+                    Gunakan kredensial ini untuk login ke halaman juri lapangan.
+                </div>
+            </div>
+        </div>
+    `;
+
+    printArea.classList.remove('hidden');
+    window.print();
+    printArea.classList.add('hidden');
+    printArea.innerHTML = '';
+};
+
+// Fungsi untuk mencetak semua kartu juri sekaligus
+window.cetakSemuaKartuJuri = function() {
+    if (!dataJuriCache || dataJuriCache.length === 0) {
+        alert("Belum ada data juri yang dimuat untuk dicetak.");
+        return;
+    }
+
+    const printArea = document.getElementById('print-area');
+    let cardsHtml = `
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 20px; font-family: 'Plus Jakarta Sans', sans-serif;">
+    `;
+
+    dataJuriCache.forEach(juri => {
+        cardsHtml += `
+            <div style="border: 2px dashed #4f46e5; border-radius: 16px; padding: 20px; text-align: center; page-break-inside: avoid;">
+                <div style="background: #4f46e5; color: white; font-weight: 800; padding: 6px 10px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; letter-spacing: 1px;">KARTU LOGIN JURI LKBB</div>
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase;">ID Juri:</span>
+                    <strong style="font-size: 16px; color: #1e293b; font-family: monospace;">${juri.idJuri}</strong>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase;">Nama / Keterangan:</span>
+                    <strong style="font-size: 14px; color: #1e293b;">${juri.namaJuri}</strong>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <span style="font-size: 11px; color: #64748b; display: block; text-transform: uppercase;">Password:</span>
+                    <strong style="font-size: 14px; color: #e11d48; font-family: monospace;">${juri.password}</strong>
+                </div>
+            </div>
+        `;
+    });
+
+    cardsHtml += `</div>`;
+    printArea.innerHTML = cardsHtml;
+
+    printArea.classList.remove('hidden');
+    window.print();
+    printArea.classList.add('hidden');
+    printArea.innerHTML = '';
+};
